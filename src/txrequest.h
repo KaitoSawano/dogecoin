@@ -90,7 +90,8 @@
  * - CPU usage is generally logarithmic in the total number of tracked announcements, plus the number of
  *   announcements affected by an operation (amortized O(1) per announcement).
  */
-class TxRequestTracker {
+class TxRequestTracker
+{
     // Avoid littering this header file with implementation details.
     class Impl;
     const std::unique_ptr<Impl> m_impl;
@@ -151,8 +152,7 @@ public:
      *    are announced simultaneously by one peer, and end up being requested from them, the requests will happen
      *    in announcement order.
      */
-    std::vector<uint256> GetRequestable(NodeId peer, int64_t now,
-        std::vector<std::pair<NodeId, uint256>>* expired = nullptr);
+    std::vector<uint256> GetRequestable(NodeId peer, int64_t now, std::vector<std::pair<NodeId, uint256> >* expired = nullptr);
 
     /** Marks a transaction as requested, with a specified expiry.
      *

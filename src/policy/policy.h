@@ -16,10 +16,10 @@
 class CCoinsViewCache;
 
 /** Recommended transaction fee by Dogecoin Core developers
-  *
-  * All fee defaults used throughout the client derive their
-  * value from this base default.
-  */
+ *
+ * All fee defaults used throughout the client derive their
+ * value from this base default.
+ */
 static const CAmount RECOMMENDED_MIN_TX_FEE = COIN / 100;
 
 /** Default for -blockmaxsize, which controls the maximum size of block the mining code will create **/
@@ -29,13 +29,13 @@ static const unsigned int DEFAULT_BLOCK_PRIORITY_SIZE = 27000;
 /** Default for -blockmaxweight, which controls the range of block weights the mining code will create **/
 static const unsigned int DEFAULT_BLOCK_MAX_WEIGHT = 3000000;
 /** Default for -blockmintxfee, which sets the minimum feerate for a transaction in blocks created by mining code **/
-static const unsigned int DEFAULT_BLOCK_MIN_TX_FEE = (unsigned int) RECOMMENDED_MIN_TX_FEE;
+static const unsigned int DEFAULT_BLOCK_MIN_TX_FEE = (unsigned int)RECOMMENDED_MIN_TX_FEE;
 /** The maximum weight for transactions we're willing to relay/mine */
 static const unsigned int MAX_STANDARD_TX_WEIGHT = 400000;
 /** Maximum number of signature check operations in an IsStandard() P2SH script */
 static const unsigned int MAX_P2SH_SIGOPS = 15;
 /** The maximum number of sigops we're willing to relay/mine in a single tx */
-static const unsigned int MAX_STANDARD_TX_SIGOPS_COST = MAX_BLOCK_SIGOPS_COST/5;
+static const unsigned int MAX_STANDARD_TX_SIGOPS_COST = MAX_BLOCK_SIGOPS_COST / 5;
 /** Default for -maxmempool, maximum megabytes of mempool memory usage */
 static const unsigned int DEFAULT_MAX_MEMPOOL_SIZE = 300;
 /** Default for -incrementalrelayfee, which sets the minimum feerate increase
@@ -109,22 +109,22 @@ static const unsigned int STANDARD_LOCKTIME_VERIFY_FLAGS = LOCKTIME_VERIFY_SEQUE
                                                            LOCKTIME_MEDIAN_TIME_PAST;
 
 bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType, const bool witnessEnabled = false);
-    /**
-     * Check for standard transaction types
-     * @return True if all outputs (scriptPubKeys) use only standard transaction forms
-     */
+/**
+ * Check for standard transaction types
+ * @return True if all outputs (scriptPubKeys) use only standard transaction forms
+ */
 bool IsStandardTx(const CTransaction& tx, std::string& reason, const bool witnessEnabled = false);
-    /**
-     * Check for standard transaction types
-     * @param[in] mapInputs    Map of previous transactions that have outputs we're spending
-     * @return True if all inputs (scriptSigs) use only standard transaction forms
-     */
+/**
+ * Check for standard transaction types
+ * @param[in] mapInputs    Map of previous transactions that have outputs we're spending
+ * @return True if all inputs (scriptSigs) use only standard transaction forms
+ */
 bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
-    /**
-     * Check if the transaction is over standard P2WSH resources limit:
-     * 3600bytes witnessScript size, 80bytes per witness stack element, 100 witness stack elements
-     * These limits are adequate for multi-signature up to n-of-100 using OP_CHECKSIG, OP_ADD, and OP_EQUAL,
-     */
+/**
+ * Check if the transaction is over standard P2WSH resources limit:
+ * 3600bytes witnessScript size, 80bytes per witness stack element, 100 witness stack elements
+ * These limits are adequate for multi-signature up to n-of-100 using OP_CHECKSIG, OP_ADD, and OP_EQUAL,
+ */
 bool IsWitnessStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
 
 extern CFeeRate incrementalRelayFee;

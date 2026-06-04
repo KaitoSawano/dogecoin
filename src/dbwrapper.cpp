@@ -5,8 +5,8 @@
 #include "dbwrapper.h"
 
 #include "fs.h"
-#include "util.h"
 #include "random.h"
+#include "util.h"
 
 #include <leveldb/cache.h>
 #include <leveldb/env.h>
@@ -111,7 +111,6 @@ std::vector<unsigned char> CDBWrapper::CreateObfuscateKey() const
     unsigned char buff[OBFUSCATE_KEY_NUM_BYTES];
     GetRandBytes(buff, OBFUSCATE_KEY_NUM_BYTES);
     return std::vector<unsigned char>(&buff[0], &buff[OBFUSCATE_KEY_NUM_BYTES]);
-
 }
 
 bool CDBWrapper::IsEmpty()
@@ -126,7 +125,8 @@ bool CDBIterator::Valid() { return piter->Valid(); }
 void CDBIterator::SeekToFirst() { piter->SeekToFirst(); }
 void CDBIterator::Next() { piter->Next(); }
 
-namespace dbwrapper_private {
+namespace dbwrapper_private
+{
 
 void HandleError(const leveldb::Status& status)
 {
@@ -142,9 +142,9 @@ void HandleError(const leveldb::Status& status)
     throw dbwrapper_error("Unknown database error");
 }
 
-const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper &w)
+const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper& w)
 {
     return w.obfuscate_key;
 }
 
-};
+}; // namespace dbwrapper_private

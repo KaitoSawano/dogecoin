@@ -5,11 +5,11 @@
 #ifndef DOGECOIN_AUXCACHE_H
 #define DOGECOIN_AUXCACHE_H
 
-#include "script/standard.h"  // for CScriptID
 #include "primitives/block.h" // for CBlock
+#include "script/standard.h"  // for CScriptID
 #include "uint256.h"          // for uint256
 
-#include <memory>             // for std::unique_ptr, std::shared_ptr
+#include <memory> // for std::unique_ptr, std::shared_ptr
 
 /** Cache to keep track of blocks templated for AuxPoW mining, by CScriptID
  *  (coinbase output script.)
@@ -17,7 +17,8 @@
  *  Searchable by coinbase scriptpubkey (CScriptID) and blockhash (uint256)
  *
  */
-class CAuxBlockCache {
+class CAuxBlockCache
+{
     // Do not put impementation details in the header because they are
     // heavy on includes. Instead use an implementation class.
     class Impl;
@@ -38,7 +39,6 @@ public:
 
     /** Get the cached CBlock (optional) by block hash */
     bool Get(const uint256 blockhash, std::shared_ptr<CBlock>& pblock);
-
 };
 
-#endif //DOGECOIN_AUXCACHE_H
+#endif // DOGECOIN_AUXCACHE_H

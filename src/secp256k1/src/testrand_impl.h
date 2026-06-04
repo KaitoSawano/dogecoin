@@ -11,14 +11,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "testrand.h"
 #include "hash.h"
+#include "testrand.h"
 
 static uint64_t secp256k1_test_state[4];
 static uint64_t secp256k1_test_rng_integer;
 static int secp256k1_test_rng_integer_bits_left = 0;
 
-SECP256K1_INLINE static void secp256k1_testrand_seed(const unsigned char *seed16) {
+SECP256K1_INLINE static void secp256k1_testrand_seed(const unsigned char* seed16)
+{
     static const unsigned char PREFIX[19] = "secp256k1 test init";
     unsigned char out32[32];
     secp256k1_sha256 hash;
@@ -32,17 +33,20 @@ SECP256K1_INLINE static void secp256k1_testrand_seed(const unsigned char *seed16
     for (i = 0; i < 4; ++i) {
         uint64_t s = 0;
         int j;
-        for (j = 0; j < 8; ++j) s = (s << 8) | out32[8*i + j];
+        for (j = 0; j < 8; ++j)
+            s = (s << 8) | out32[8 * i + j];
         secp256k1_test_state[i] = s;
     }
     secp256k1_test_rng_integer_bits_left = 0;
 }
 
-SECP256K1_INLINE static uint64_t rotl(const uint64_t x, int k) {
+SECP256K1_INLINE static uint64_t rotl(const uint64_t x, int k)
+{
     return (x << k) | (x >> (64 - k));
 }
 
-SECP256K1_INLINE static uint64_t secp256k1_testrand64(void) {
+SECP256K1_INLINE static uint64_t secp256k1_testrand64(void)
+{
     /* Test-only Xoshiro256++ RNG. See https://prng.di.unimi.it/ */
     const uint64_t result = rotl(secp256k1_test_state[0] + secp256k1_test_state[3], 23) + secp256k1_test_state[0];
     const uint64_t t = secp256k1_test_state[1] << 17;
@@ -55,7 +59,8 @@ SECP256K1_INLINE static uint64_t secp256k1_testrand64(void) {
     return result;
 }
 
-SECP256K1_INLINE static uint64_t secp256k1_testrand_bits(int bits) {
+SECP256K1_INLINE static uint64_t secp256k1_testrand_bits(int bits)
+{
     uint64_t ret;
     if (secp256k1_test_rng_integer_bits_left < bits) {
         secp256k1_test_rng_integer = secp256k1_testrand64();
@@ -68,11 +73,13 @@ SECP256K1_INLINE static uint64_t secp256k1_testrand_bits(int bits) {
     return ret;
 }
 
-SECP256K1_INLINE static uint32_t secp256k1_testrand32(void) {
+SECP256K1_INLINE static uint32_t secp256k1_testrand32(void)
+{
     return secp256k1_testrand_bits(32);
 }
 
-static uint32_t secp256k1_testrand_int(uint32_t range) {
+static uint32_t secp256k1_testrand_int(uint32_t range)
+{
     /* We want a uniform integer between 0 and range-1, inclusive.
      * B is the smallest number such that range <= 2**B.
      * two mechanisms implemented here:
@@ -103,7 +110,7 @@ static uint32_t secp256k1_testrand_int(uint32_t range) {
         trange = range;
         mult = 1;
     }
-    while(1) {
+    while (1) {
         uint32_t x = secp256k1_testrand_bits(bits);
         if (x < trange) {
             return (mult == 1) ? x : (x % range);
@@ -111,7 +118,8 @@ static uint32_t secp256k1_testrand_int(uint32_t range) {
     }
 }
 
-static void secp256k1_testrand256(unsigned char *b32) {
+static void secp256k1_testrand256(unsigned char* b32)
+{
     int i;
     for (i = 0; i < 4; ++i) {
         uint64_t val = secp256k1_testrand64();
@@ -127,7 +135,8 @@ static void secp256k1_testrand256(unsigned char *b32) {
     }
 }
 
-static void secp256k1_testrand_bytes_test(unsigned char *bytes, size_t len) {
+static void secp256k1_testrand_bytes_test(unsigned char* bytes, size_t len)
+{
     size_t bits = 0;
     memset(bytes, 0, len);
     while (bits < len * 8) {
@@ -143,15 +152,18 @@ static void secp256k1_testrand_bytes_test(unsigned char *bytes, size_t len) {
     }
 }
 
-static void secp256k1_testrand256_test(unsigned char *b32) {
+static void secp256k1_testrand256_test(unsigned char* b32)
+{
     secp256k1_testrand_bytes_test(b32, 32);
 }
 
-static void secp256k1_testrand_flip(unsigned char *b, size_t len) {
+static void secp256k1_testrand_flip(unsigned char* b, size_t len)
+{
     b[secp256k1_testrand_int(len)] ^= (1 << secp256k1_testrand_bits(3));
 }
 
-static void secp256k1_testrand_init(const char* hexseed) {
+static void secp256k1_testrand_init(const char* hexseed)
+{
     unsigned char seed16[16] = {0};
     if (hexseed && strlen(hexseed) != 0) {
         int pos = 0;
@@ -166,7 +178,7 @@ static void secp256k1_testrand_init(const char* hexseed) {
             pos++;
         }
     } else {
-        FILE *frand = fopen("/dev/urandom", "rb");
+        FILE* frand = fopen("/dev/urandom", "rb");
         if ((frand == NULL) || fread(&seed16, 1, sizeof(seed16), frand) != sizeof(seed16)) {
             uint64_t t = time(NULL) * (uint64_t)1337;
             fprintf(stderr, "WARNING: could not read 16 bytes from /dev/urandom; falling back to insecure PRNG\n");
@@ -188,7 +200,8 @@ static void secp256k1_testrand_init(const char* hexseed) {
     secp256k1_testrand_seed(seed16);
 }
 
-static void secp256k1_testrand_finish(void) {
+static void secp256k1_testrand_finish(void)
+{
     unsigned char run32[32];
     secp256k1_testrand256(run32);
     printf("random run = %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n", run32[0], run32[1], run32[2], run32[3], run32[4], run32[5], run32[6], run32[7], run32[8], run32[9], run32[10], run32[11], run32[12], run32[13], run32[14], run32[15]);

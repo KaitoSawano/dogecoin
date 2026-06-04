@@ -7,13 +7,14 @@
 #ifndef SECP256K1_ECMULT_GEN_COMPUTE_TABLE_IMPL_H
 #define SECP256K1_ECMULT_GEN_COMPUTE_TABLE_IMPL_H
 
-#include "ecmult_gen_compute_table.h"
-#include "group_impl.h"
-#include "field_impl.h"
 #include "ecmult_gen.h"
+#include "ecmult_gen_compute_table.h"
+#include "field_impl.h"
+#include "group_impl.h"
 #include "util.h"
 
-static void secp256k1_ecmult_gen_compute_table(secp256k1_ge_storage* table, const secp256k1_ge* gen, int bits) {
+static void secp256k1_ecmult_gen_compute_table(secp256k1_ge_storage* table, const secp256k1_ge* gen, int bits)
+{
     int g = ECMULT_GEN_PREC_G(bits);
     int n = ECMULT_GEN_PREC_N(bits);
 
@@ -46,14 +47,14 @@ static void secp256k1_ecmult_gen_compute_table(secp256k1_ge_storage* table, cons
     {
         secp256k1_gej gbase;
         secp256k1_gej numsbase;
-        secp256k1_gej* precj = checked_malloc(&default_error_callback, n * g * sizeof(*precj));  /* Jacobian versions of prec. */
-        gbase = gj; /* PREC_G^j * G */
-        numsbase = nums_gej; /* 2^j * nums. */
+        secp256k1_gej* precj = checked_malloc(&default_error_callback, n * g * sizeof(*precj)); /* Jacobian versions of prec. */
+        gbase = gj;                                                                             /* PREC_G^j * G */
+        numsbase = nums_gej;                                                                    /* 2^j * nums. */
         for (j = 0; j < n; j++) {
             /* Set precj[j*PREC_G .. j*PREC_G+(PREC_G-1)] to (numsbase, numsbase + gbase, ..., numsbase + (PREC_G-1)*gbase). */
-            precj[j*g] = numsbase;
+            precj[j * g] = numsbase;
             for (i = 1; i < g; i++) {
-                secp256k1_gej_add_var(&precj[j*g + i], &precj[j*g + i - 1], &gbase, NULL);
+                secp256k1_gej_add_var(&precj[j * g + i], &precj[j * g + i - 1], &gbase, NULL);
             }
             /* Multiply gbase by PREC_G. */
             for (i = 0; i < bits; i++) {
@@ -72,7 +73,7 @@ static void secp256k1_ecmult_gen_compute_table(secp256k1_ge_storage* table, cons
     }
     for (j = 0; j < n; j++) {
         for (i = 0; i < g; i++) {
-            secp256k1_ge_to_storage(&table[j*g + i], &prec[j*g + i]);
+            secp256k1_ge_to_storage(&table[j * g + i], &prec[j * g + i]);
         }
     }
     free(prec);

@@ -17,7 +17,7 @@
 struct CDNSSeedData {
     std::string name, host;
     bool supportsServiceBitsFiltering;
-    CDNSSeedData(const std::string &strName, const std::string &strHost, bool supportsServiceBitsFilteringIn = false) : name(strName), host(strHost), supportsServiceBitsFiltering(supportsServiceBitsFilteringIn) {}
+    CDNSSeedData(const std::string& strName, const std::string& strHost, bool supportsServiceBitsFilteringIn = false) : name(strName), host(strHost), supportsServiceBitsFiltering(supportsServiceBitsFilteringIn) {}
 };
 
 struct SeedSpec6 {
@@ -57,8 +57,9 @@ public:
         MAX_BASE58_TYPES
     };
 
-    const Consensus::Params& GetConsensus(uint32_t nTargetHeight) const {
-        return *(pConsensusRoot -> GetConsensus(nTargetHeight));
+    const Consensus::Params& GetConsensus(uint32_t nTargetHeight) const
+    {
+        return *(pConsensusRoot->GetConsensus(nTargetHeight));
     }
 
     const CMessageHeader::MessageStartChars& MessageStart() const { return pchMessageStart; }
@@ -86,7 +87,7 @@ protected:
     CChainParams() {}
 
     Consensus::Params consensus;
-    Consensus::Params *pConsensusRoot; // Binary search tree root
+    Consensus::Params* pConsensusRoot; // Binary search tree root
     CMessageHeader::MessageStartChars pchMessageStart;
     int nDefaultPort;
     uint64_t nPruneAfterHeight;
@@ -107,7 +108,7 @@ protected:
  * Return the currently selected parameters. This won't change after app
  * startup, except for unit tests.
  */
-const CChainParams &Params();
+const CChainParams& Params();
 
 /**
  * @returns CChainParams for the given BIP70 chain name.

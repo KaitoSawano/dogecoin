@@ -7,41 +7,40 @@
 #include "clientmodel.h"
 #include "utiltime.h"
 
+#include <QColor>
 #include <QPainter>
 #include <QPainterPath>
-#include <QColor>
 #include <QTimer>
 
 #include <cmath>
 
-#define NUM_DISPLAYED_SAMPLES         800
-#define BASE_SAMPLES_BUF_SIZE         24 * 60 * 60
-#define BASE_SAMPLE_PERIOD_MS         1000
+#define NUM_DISPLAYED_SAMPLES 800
+#define BASE_SAMPLES_BUF_SIZE 24 * 60 * 60
+#define BASE_SAMPLE_PERIOD_MS 1000
 
-#define XMARGIN                 10
-#define YMARGIN                 10
+#define XMARGIN 10
+#define YMARGIN 10
 
-TrafficGraphWidget::TrafficGraphWidget(QWidget *parent) :
-    QWidget(parent),
-    fMax(0.0f),
-    nMins(0),
+TrafficGraphWidget::TrafficGraphWidget(QWidget* parent) : QWidget(parent),
+                                                          fMax(0.0f),
+                                                          nMins(0),
 
-    vTimespanSamplesIn(NUM_DISPLAYED_SAMPLES),
-    vTimespanSamplesOut(NUM_DISPLAYED_SAMPLES),
-    nTimespanLastBytesIn(0),
-    nTimespanLastBytesOut(0),
-    nTimespanLastSampleTimeMs(0),
-    nTimespanHeadIndex(0),
-    timespanTimer(0),
-    vBaseSamplesIn(BASE_SAMPLES_BUF_SIZE),
-    vBaseSamplesOut(BASE_SAMPLES_BUF_SIZE),
-    nBaseLastBytesIn(0),
-    nBaseLastBytesOut(0),
-    nBaseLastSampleTimeMs(0),
-    nBaseSamplesHeadIndex(0),
-    baseTimer(0),
+                                                          vTimespanSamplesIn(NUM_DISPLAYED_SAMPLES),
+                                                          vTimespanSamplesOut(NUM_DISPLAYED_SAMPLES),
+                                                          nTimespanLastBytesIn(0),
+                                                          nTimespanLastBytesOut(0),
+                                                          nTimespanLastSampleTimeMs(0),
+                                                          nTimespanHeadIndex(0),
+                                                          timespanTimer(0),
+                                                          vBaseSamplesIn(BASE_SAMPLES_BUF_SIZE),
+                                                          vBaseSamplesOut(BASE_SAMPLES_BUF_SIZE),
+                                                          nBaseLastBytesIn(0),
+                                                          nBaseLastBytesOut(0),
+                                                          nBaseLastSampleTimeMs(0),
+                                                          nBaseSamplesHeadIndex(0),
+                                                          baseTimer(0),
 
-    clientModel(0)
+                                                          clientModel(0)
 {
     timespanTimer = new QTimer(this);
     connect(timespanTimer, SIGNAL(timeout()), SLOT(updateTimespanRates()));
@@ -50,10 +49,10 @@ TrafficGraphWidget::TrafficGraphWidget(QWidget *parent) :
     connect(baseTimer, SIGNAL(timeout()), SLOT(updateBaseRates()));
 }
 
-void TrafficGraphWidget::setClientModel(ClientModel *model)
+void TrafficGraphWidget::setClientModel(ClientModel* model)
 {
     clientModel = model;
-    if(model) {
+    if (model) {
         nTimespanLastBytesIn = model->getTotalBytesRecv();
         nTimespanLastBytesOut = model->getTotalBytesSent();
         nBaseLastBytesIn = nTimespanLastBytesIn;
@@ -68,7 +67,7 @@ int TrafficGraphWidget::getGraphRangeMins() const
     return nMins;
 }
 
-float TrafficGraphWidget::resampleSamples(const QVector<float> &source, QVector<float> &dest) const
+float TrafficGraphWidget::resampleSamples(const QVector<float>& source, QVector<float>& dest) const
 {
     int numSourceSamples = nMins * 60;
     float stride = (float)numSourceSamples / dest.size();
@@ -101,8 +100,7 @@ float TrafficGraphWidget::resampleSamples(const QVector<float> &source, QVector<
         if (numSamplesToRead == 0) {
             // We seem to be trying to upsample. just use the previous sample.
             averageRate = lastAverageRate;
-        }
-        else {
+        } else {
             averageRate = aggregate / numSamplesToRead;
         }
 
@@ -118,7 +116,7 @@ float TrafficGraphWidget::resampleSamples(const QVector<float> &source, QVector<
     return maxSample;
 }
 
-void TrafficGraphWidget::paintPath(QPainterPath &path, const QVector<float> &samples, int samplesHead)
+void TrafficGraphWidget::paintPath(QPainterPath& path, const QVector<float>& samples, int samplesHead)
 {
     int h = height() - YMARGIN * 2;
     int w = width() - XMARGIN * 2;
@@ -144,7 +142,7 @@ void TrafficGraphWidget::paintPath(QPainterPath &path, const QVector<float> &sam
     path.lineTo(XMARGIN + w, YMARGIN + h);
 }
 
-void TrafficGraphWidget::paintEvent(QPaintEvent *)
+void TrafficGraphWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     painter.fillRect(rect(), Qt::black);
@@ -162,27 +160,27 @@ void TrafficGraphWidget::paintEvent(QPaintEvent *)
     int base = floor(log10(fMax));
     float val = pow(10.0f, base);
 
-    const QString units     = tr("KB/s");
+    const QString units = tr("KB/s");
     const float yMarginText = 2.0;
 
     // draw lines
     painter.setPen(axisCol);
-    painter.drawText(XMARGIN, YMARGIN + h - h * val / fMax-yMarginText, QString("%1 %2").arg(val).arg(units));
-    for(float y = val; y < fMax; y += val) {
+    painter.drawText(XMARGIN, YMARGIN + h - h * val / fMax - yMarginText, QString("%1 %2").arg(val).arg(units));
+    for (float y = val; y < fMax; y += val) {
         int yy = YMARGIN + h - h * y / fMax;
         painter.drawLine(XMARGIN, yy, width() - XMARGIN, yy);
     }
 
     // if we drew 3 or fewer lines, break them up at the next lower order of magnitude
-    if(fMax / val <= 3.0f) {
+    if (fMax / val <= 3.0f) {
         axisCol = axisCol.darker();
         val = pow(10.0f, base - 1);
         painter.setPen(axisCol);
-        painter.drawText(XMARGIN, YMARGIN + h - h * val / fMax-yMarginText, QString("%1 %2").arg(val).arg(units));
+        painter.drawText(XMARGIN, YMARGIN + h - h * val / fMax - yMarginText, QString("%1 %2").arg(val).arg(units));
         int count = 1;
-        for(float y = val; y < fMax; y += val, count++) {
+        for (float y = val; y < fMax; y += val, count++) {
             // don't overwrite lines drawn above
-            if(count % 10 == 0)
+            if (count % 10 == 0)
                 continue;
             int yy = YMARGIN + h - h * y / fMax;
             painter.drawLine(XMARGIN, yy, width() - XMARGIN, yy);
@@ -234,8 +232,7 @@ void TrafficGraphWidget::updateTimespanRates()
 
     fMax = 0.0f;
     const int nInSampleSize = std::min(vTimespanSamplesIn.size(), vTimespanSamplesOut.size());
-    for (int i = 0; i < nInSampleSize; i++)
-    {
+    for (int i = 0; i < nInSampleSize; i++) {
         fMax = std::max(std::max(fMax, vTimespanSamplesIn[i]), vTimespanSamplesOut[i]);
     }
 

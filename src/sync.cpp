@@ -9,13 +9,13 @@
 
 #include <stdio.h>
 
+#include <map>
+#include <mutex>
+#include <set>
 #include <thread>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <set>
-#include <map>
-#include <mutex>
 
 #ifdef DEBUG_LOCKCONTENTION
 void PrintLockContention(const char* pszName, const char* pszFile, int nLine)
@@ -54,6 +54,7 @@ struct CLockLocation {
     std::string MutexName() const { return mutexName; }
 
     bool fTry;
+
 private:
     std::string mutexName;
     std::string sourceFile;
@@ -75,7 +76,8 @@ struct LockData {
     std::mutex dd_mutex;
 };
 
-LockData& GetLockData() {
+LockData& GetLockData()
+{
     static LockData& lock_data = *new LockData();
     return lock_data;
 }

@@ -15,52 +15,51 @@
 #include "bitcoinunits.h"
 
 #ifdef ENABLE_WALLET
+#include "coincontroldialog.h"
 #include "sendcoinsdialog.h"
 #include "sendcoinsentry.h"
-#include "coincontroldialog.h"
 #endif
 
-#include "optionsmodel.h"
 #include "bitcoingui.h"
 #include "clientmodel.h"
 #include "guiconstants.h"
-#include "intro.h"
 #include "guiutil.h"
+#include "intro.h"
+#include "optionsmodel.h"
 
 #include "base58.h"
 #include "clientversion.h"
 #include "init.h"
 #include "key.h"
-#include "util.h"
 #include "net.h"
+#include "util.h"
 #include "utilstrencodings.h"
 
 #include <stdio.h>
 
 #include <QCloseEvent>
 #include <QFont>
+#include <QInputDialog>
 #include <QLabel>
 #include <QRegExp>
-#include <QTextTable>
 #include <QTextCursor>
+#include <QTextTable>
 #include <QVBoxLayout>
-#include <QInputDialog>
 
 #ifdef USE_QRCODE
 #include <qrencode.h>
 #endif
 
-#include <QtPrintSupport/QPrinter>
+#include "walletmodel.h"
+#include <QPainter>
 #include <QtPrintSupport/QPrintDialog>
 #include <QtPrintSupport/QPrintPreviewDialog>
+#include <QtPrintSupport/QPrinter>
 #include <QtPrintSupport/QPrinterInfo>
-#include <QPainter>
-#include "walletmodel.h"
 
 /** "Help message" or "About" dialog box */
-HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) :
-    QDialog(parent),
-    ui(new Ui::HelpMessageDialog)
+HelpMessageDialog::HelpMessageDialog(QWidget* parent, bool about) : QDialog(parent),
+                                                                    ui(new Ui::HelpMessageDialog)
 {
     ui->setupUi(this);
 
@@ -70,12 +69,11 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) :
      */
 #if defined(__x86_64__)
     version += " " + tr("(%1-bit)").arg(64);
-#elif defined(__i386__ )
+#elif defined(__i386__)
     version += " " + tr("(%1-bit)").arg(32);
 #endif
 
-    if (about)
-    {
+    if (about) {
         setWindowTitle(tr("About %1").arg(tr(PACKAGE_NAME)));
 
         /// HTML-format the license message from the core
@@ -97,7 +95,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) :
     } else {
         setWindowTitle(tr("Command-line options"));
         QString header = tr("Usage:") + "\n" +
-            "  dogecoin-qt [" + tr("command-line options") + "]                     " + "\n";
+                         "  dogecoin-qt [" + tr("command-line options") + "]                     " + "\n";
         QTextCursor cursor(ui->helpMessage->document());
         cursor.insertText(version);
         cursor.insertBlock();
@@ -129,18 +127,17 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) :
         QTextCharFormat bold;
         bold.setFontWeight(QFont::Bold);
 
-        Q_FOREACH (const QString &line, coreOptions.split("\n")) {
-            if (line.startsWith("  -"))
-            {
+        Q_FOREACH (const QString& line, coreOptions.split("\n")) {
+            if (line.startsWith("  -")) {
                 cursor.currentTable()->appendRows(1);
                 cursor.movePosition(QTextCursor::PreviousCell);
                 cursor.movePosition(QTextCursor::NextRow);
                 cursor.insertText(line.trimmed());
                 cursor.movePosition(QTextCursor::NextCell);
             } else if (line.startsWith("   ")) {
-                cursor.insertText(line.trimmed()+' ');
+                cursor.insertText(line.trimmed() + ' ');
             } else if (line.size() > 0) {
-                //Title of a group
+                // Title of a group
                 if (cursor.currentTable())
                     cursor.currentTable()->appendRows(1);
                 cursor.movePosition(QTextCursor::Down);
@@ -183,9 +180,8 @@ void HelpMessageDialog::on_okButton_accepted()
 }
 
 /** "PaperWallet" dialog box */
-PaperWalletDialog::PaperWalletDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::PaperWalletDialog)
+PaperWalletDialog::PaperWalletDialog(QWidget* parent) : QDialog(parent),
+                                                        ui(new Ui::PaperWalletDialog)
 {
     ui->setupUi(this);
 
@@ -203,7 +199,7 @@ PaperWalletDialog::PaperWalletDialog(QWidget *parent) :
     setFixedSize(size());
 }
 
-void PaperWalletDialog::setClientModel(ClientModel *_clientModel)
+void PaperWalletDialog::setClientModel(ClientModel* _clientModel)
 {
     this->clientModel = _clientModel;
 
@@ -213,7 +209,7 @@ void PaperWalletDialog::setClientModel(ClientModel *_clientModel)
     }
 }
 
-void PaperWalletDialog::setModel(WalletModel *model)
+void PaperWalletDialog::setModel(WalletModel* model)
 {
     RandAddSeed();
     this->model = model;
@@ -246,7 +242,7 @@ void PaperWalletDialog::on_getNewAddress_clicked()
 
 #ifdef USE_QRCODE
     // Generate the address QR code
-    QRcode *code = QRcode_encodeString(myAddress.c_str(), 0, QR_ECLEVEL_M, QR_MODE_8, 1);
+    QRcode* code = QRcode_encodeString(myAddress.c_str(), 0, QR_ECLEVEL_M, QR_MODE_8, 1);
     if (!code) {
         ui->addressQRCode->setText(tr("Error encoding Address into QR Code."));
         return;
@@ -462,8 +458,8 @@ void PaperWalletDialog::on_printButton_clicked()
     }
 
     questionString.append(tr("Total Amount %1 (= %2)")
-                              .arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), totalAmount))
-                              .arg(alternativeUnits.join(" " + tr("or") + " ")));
+            .arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), totalAmount))
+            .arg(alternativeUnits.join(" " + tr("or") + " ")));
 
     QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm send coins"), questionString.arg(formatted.join("<br />")), QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 
@@ -483,23 +479,22 @@ void PaperWalletDialog::on_printButton_clicked()
 }
 
 /** "Shutdown" window */
-ShutdownWindow::ShutdownWindow(QWidget *parent, Qt::WindowFlags f):
-    QWidget(parent, f)
+ShutdownWindow::ShutdownWindow(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
-    QVBoxLayout *layout = new QVBoxLayout();
+    QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(new QLabel(
         tr("%1 is shutting down...").arg(tr(PACKAGE_NAME)) + "<br /><br />" +
         tr("Do not shut down the computer until this window disappears.")));
     setLayout(layout);
 }
 
-QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI *window)
+QWidget* ShutdownWindow::showShutdownWindow(BitcoinGUI* window)
 {
     if (!window)
         return nullptr;
 
     // Show a simple window indicating shutdown status
-    QWidget *shutdownWindow = new ShutdownWindow();
+    QWidget* shutdownWindow = new ShutdownWindow();
     shutdownWindow->setWindowTitle(window->windowTitle());
 
     // Center shutdown window at where main window was
@@ -509,7 +504,7 @@ QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI *window)
     return shutdownWindow;
 }
 
-void ShutdownWindow::closeEvent(QCloseEvent *event)
+void ShutdownWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
 }

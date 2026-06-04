@@ -12,16 +12,16 @@
 #include "base58.h"
 #include "guiutil.h"
 #include "platformstyle.h"
+#include "util.h"
 #include "validation.h"
 #include "wallet/wallet.h"
 #include "walletmodel.h"
-#include "util.h"
 
-#include <QThread>
 #include <QDebug>
+#include <QThread>
 
 /* Object for executing key import commands in a separate thread.
-*/
+ */
 class ImportKeyExecutor : public QObject
 {
     Q_OBJECT
@@ -44,10 +44,9 @@ void ImportKeyExecutor::rescan(CWallet* pwallet, CBlockIndex* genesisBlock)
     QObject::thread()->quit();
 }
 
-ImportKeysDialog::ImportKeysDialog(const PlatformStyle *_platformStyle, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::ImportKeysDialog),
-    platformStyle(_platformStyle)
+ImportKeysDialog::ImportKeysDialog(const PlatformStyle* _platformStyle, QWidget* parent) : QDialog(parent),
+                                                                                           ui(new Ui::ImportKeysDialog),
+                                                                                           platformStyle(_platformStyle)
 {
     ui->setupUi(this);
 
@@ -83,9 +82,9 @@ void ImportKeysDialog::on_resetButton_clicked()
 
 bool ImportKeysDialog::importKey()
 {
-    const QString privateKey      = ui->privateKey->text();
+    const QString privateKey = ui->privateKey->text();
     const QString privateKeyLabel = ui->privateKeyLabel->text();
-    const bool rescan             = ui->rescanCheckBox->isChecked();
+    const bool rescan = ui->rescanCheckBox->isChecked();
 
     resetDialogValues();
 
@@ -114,8 +113,7 @@ bool ImportKeysDialog::importKey()
     if (pwalletMain->HaveKey(vchAddress)) {
         vchSecret.SetString("");
         ui->privateKeyImportTextMessage->setText(
-            tr("Invalid address generated from private key; please check and try again!"
-        ));
+            tr("Invalid address generated from private key; please check and try again!"));
         return false;
     }
 
@@ -130,7 +128,7 @@ bool ImportKeysDialog::importKey()
     pwalletMain->UpdateTimeFirstKey(1);
 
     if (rescan) {
-        ImportKeyExecutor *executor = new ImportKeyExecutor();
+        ImportKeyExecutor* executor = new ImportKeyExecutor();
         executor->moveToThread(&thread);
         connect(this, SIGNAL(rescanWallet(CWallet*, CBlockIndex*)), executor, SLOT(rescan(CWallet*, CBlockIndex*)));
 

@@ -7,8 +7,8 @@
 #include "chainparams.h"
 #include "pow.h"
 #include "random.h"
-#include "util.h"
 #include "test/test_bitcoin.h"
+#include "util.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(get_next_work_pow_limit)
     int64_t nLastRetargetTime = 1231006505; // Block #0
     CBlockIndex pindexLast;
     pindexLast.nHeight = 2015;
-    pindexLast.nTime = 1233061996;  // Block #2015
+    pindexLast.nTime = 1233061996; // Block #2015
     pindexLast.nBits = 0x1d00ffff;
     BOOST_CHECK_EQUAL(CalculateNextWorkRequired(&pindexLast, nLastRetargetTime, params), 0x1d03fffc);
 }
@@ -86,9 +86,9 @@ BOOST_AUTO_TEST_CASE(GetBlockProofEquivalentTime_test)
     }
 
     for (int j = 0; j < 1000; j++) {
-        CBlockIndex *p1 = &blocks[InsecureRandRange(10000)];
-        CBlockIndex *p2 = &blocks[InsecureRandRange(10000)];
-        CBlockIndex *p3 = &blocks[InsecureRandRange(10000)];
+        CBlockIndex* p1 = &blocks[InsecureRandRange(10000)];
+        CBlockIndex* p2 = &blocks[InsecureRandRange(10000)];
+        CBlockIndex* p3 = &blocks[InsecureRandRange(10000)];
 
         int64_t tdiff = GetBlockProofEquivalentTime(*p1, *p2, *p3, params);
         BOOST_CHECK_EQUAL(tdiff, p1->GetBlockTime() - p2->GetBlockTime());

@@ -8,13 +8,13 @@
 #include "chainparams.h"
 #include "consensus/validation.h"
 #include "fs.h"
-#include "validation.h"
 #include "rpc/register.h"
 #include "rpc/server.h"
 #include "rpcconsole.h"
 #include "test/testutil.h"
 #include "univalue.h"
 #include "util.h"
+#include "validation.h"
 
 #include <QDir>
 #include <QtGlobal>
@@ -28,8 +28,8 @@ static UniValue rpcNestedTest_rpc(const JSONRPCRequest& request)
 }
 
 static const CRPCCommand vRPCCommands[] =
-{
-    { "test", "rpcNestedTest", &rpcNestedTest_rpc, true, {} },
+    {
+        {"test", "rpcNestedTest", &rpcNestedTest_rpc, true, {}},
 };
 
 void RPCNestedTests::rpcNestedTests()
@@ -46,7 +46,7 @@ void RPCNestedTests::rpcNestedTests()
     QDir dir(QString::fromStdString(path));
     dir.mkpath(".");
     ForceSetArg("-datadir", path);
-    //mempool.setSanityCheck(1.0);
+    // mempool.setSanityCheck(1.0);
     pblocktree = new CBlockTreeDB(1 << 20, true);
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
@@ -62,31 +62,31 @@ void RPCNestedTests::rpcNestedTests()
     std::string result;
     std::string result2;
     std::string filtered;
-    RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()[chain]", &filtered); //simple result filtering with path
-    QVERIFY(result=="main");
+    RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()[chain]", &filtered); // simple result filtering with path
+    QVERIFY(result == "main");
     QVERIFY(filtered == "getblockchaininfo()[chain]");
 
-    RPCConsole::RPCExecuteCommandLine(result, "getblock(getbestblockhash())"); //simple 2 level nesting
+    RPCConsole::RPCExecuteCommandLine(result, "getblock(getbestblockhash())"); // simple 2 level nesting
     RPCConsole::RPCExecuteCommandLine(result, "getblock(getblock(getbestblockhash())[hash], true)");
 
-    RPCConsole::RPCExecuteCommandLine(result, "getblock( getblock( getblock(getbestblockhash())[hash] )[hash], true)"); //4 level nesting with whitespace, filtering path and boolean parameter
+    RPCConsole::RPCExecuteCommandLine(result, "getblock( getblock( getblock(getbestblockhash())[hash] )[hash], true)"); // 4 level nesting with whitespace, filtering path and boolean parameter
 
     RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo");
-    QVERIFY(result.substr(0,1) == "{");
+    QVERIFY(result.substr(0, 1) == "{");
 
     RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()");
-    QVERIFY(result.substr(0,1) == "{");
+    QVERIFY(result.substr(0, 1) == "{");
 
-    RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo "); //whitespace at the end will be tolerated
-    QVERIFY(result.substr(0,1) == "{");
+    RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo "); // whitespace at the end will be tolerated
+    QVERIFY(result.substr(0, 1) == "{");
 
-    (RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()[\"chain\"]")); //Quote path identifier are allowed, but look after a child contaning the quotes in the key
+    (RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()[\"chain\"]")); // Quote path identifier are allowed, but look after a child contaning the quotes in the key
     QVERIFY(result == "null");
 
-    (RPCConsole::RPCExecuteCommandLine(result, "createrawtransaction [] {} 0")); //parameter not in brackets are allowed
-    (RPCConsole::RPCExecuteCommandLine(result2, "createrawtransaction([],{},0)")); //parameter in brackets are allowed
+    (RPCConsole::RPCExecuteCommandLine(result, "createrawtransaction [] {} 0"));   // parameter not in brackets are allowed
+    (RPCConsole::RPCExecuteCommandLine(result2, "createrawtransaction([],{},0)")); // parameter in brackets are allowed
     QVERIFY(result == result2);
-    (RPCConsole::RPCExecuteCommandLine(result2, "createrawtransaction( [],  {} , 0   )")); //whitespace between parametres is allowed
+    (RPCConsole::RPCExecuteCommandLine(result2, "createrawtransaction( [],  {} , 0   )")); // whitespace between parametres is allowed
     QVERIFY(result == result2);
 
     RPCConsole::RPCExecuteCommandLine(result, "getblock(getbestblockhash())[tx][0]", &filtered);
@@ -137,15 +137,15 @@ void RPCNestedTests::rpcNestedTests()
 
 #if QT_VERSION >= 0x050300
     // do the QVERIFY_EXCEPTION_THROWN checks only with Qt5.3 and higher (QVERIFY_EXCEPTION_THROWN was introduced in Qt5.3)
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo() .\n"), std::runtime_error); //invalid syntax
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo() getblockchaininfo()"), std::runtime_error); //invalid syntax
-    (RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo(")); //tolerate non closing brackets if we have no arguments
-    (RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()()()")); //tolerate non command brackts
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo(True)"), UniValue); //invalid argument
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "a(getblockchaininfo(True))"), UniValue); //method not found
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "rpcNestedTest abc,,abc"), std::runtime_error); //don't tollerate empty arguments when using ,
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "rpcNestedTest(abc,,abc)"), std::runtime_error); //don't tollerate empty arguments when using ,
-    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "rpcNestedTest(abc,,)"), std::runtime_error); //don't tollerate empty arguments when using ,
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo() .\n"), std::runtime_error);                 // invalid syntax
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo() getblockchaininfo()"), std::runtime_error); // invalid syntax
+    (RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo("));                                                                  // tolerate non closing brackets if we have no arguments
+    (RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo()()()"));                                                             // tolerate non command brackts
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "getblockchaininfo(True)"), UniValue);                           // invalid argument
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "a(getblockchaininfo(True))"), UniValue);                        // method not found
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "rpcNestedTest abc,,abc"), std::runtime_error);                  // don't tollerate empty arguments when using ,
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "rpcNestedTest(abc,,abc)"), std::runtime_error);                 // don't tollerate empty arguments when using ,
+    QVERIFY_EXCEPTION_THROWN(RPCConsole::RPCExecuteCommandLine(result, "rpcNestedTest(abc,,)"), std::runtime_error);                    // don't tollerate empty arguments when using ,
 #endif
 
     delete pcoinsTip;

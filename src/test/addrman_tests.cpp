@@ -4,8 +4,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "addrman.h"
 #include "test/test_bitcoin.h"
-#include <string>
 #include <boost/test/unit_test.hpp>
+#include <string>
 
 #include "hash.h"
 #include "netbase.h"
@@ -217,11 +217,11 @@ BOOST_AUTO_TEST_CASE(addrman_new_collisions)
         CService addr = ResolveService("250.1.1." + boost::to_string(i));
         addrman.Add(CAddress(addr, NODE_NONE), source);
 
-        //Test 13: No collision in new table yet.
+        // Test 13: No collision in new table yet.
         BOOST_CHECK(addrman.size() == i);
     }
 
-    //Test 14: new table collision!
+    // Test 14: new table collision!
     CService addr1 = ResolveService("250.1.1.18");
     addrman.Add(CAddress(addr1, NODE_NONE), source);
     BOOST_CHECK(addrman.size() == 17);
@@ -247,11 +247,11 @@ BOOST_AUTO_TEST_CASE(addrman_tried_collisions)
         addrman.Add(CAddress(addr, NODE_NONE), source);
         addrman.Good(CAddress(addr, NODE_NONE));
 
-        //Test 15: No collision in tried table yet.
+        // Test 15: No collision in tried table yet.
         BOOST_CHECK_EQUAL(addrman.size(), i);
     }
 
-    //Test 16: tried table collision!
+    // Test 16: tried table collision!
     CService addr1 = ResolveService("250.1.1.80");
     addrman.Add(CAddress(addr1, NODE_NONE), source);
     BOOST_CHECK(addrman.size() == 79);
@@ -512,7 +512,8 @@ BOOST_AUTO_TEST_CASE(caddrinfo_get_new_bucket)
     for (int j = 0; j < 4 * 255; j++) {
         CAddrInfo infoj = CAddrInfo(CAddress(
                                         ResolveService(
-                                            boost::to_string(250 + (j / 255)) + "." + boost::to_string(j % 256) + ".1.1"), NODE_NONE),
+                                            boost::to_string(250 + (j / 255)) + "." + boost::to_string(j % 256) + ".1.1"),
+                                        NODE_NONE),
             ResolveIP("251.4.1.1"));
         int bucket = infoj.GetNewBucket(nKey1);
         buckets.insert(bucket);

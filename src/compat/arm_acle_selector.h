@@ -7,7 +7,7 @@
 // with the patched version from 8c92fcb13a4979232787f0476bf7469ccbb03617
 // at https://gcc.gnu.org/git/?p=gcc.git
 #if (__GNUC__ == 9 && __GNUC_MINOR__ == 4)
-# include "compat/arm_acle_patched.h"
+#include "compat/arm_acle_patched.h"
 #else
-# include <arm_acle.h>
+#include <arm_acle.h>
 #endif

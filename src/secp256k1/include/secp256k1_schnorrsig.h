@@ -39,15 +39,14 @@ extern "C" {
  *  the message, the key, the pubkey, the algorithm description, and data.
  */
 typedef int (*secp256k1_nonce_function_hardened)(
-    unsigned char *nonce32,
-    const unsigned char *msg,
+    unsigned char* nonce32,
+    const unsigned char* msg,
     size_t msglen,
-    const unsigned char *key32,
-    const unsigned char *xonly_pk32,
-    const unsigned char *algo,
+    const unsigned char* key32,
+    const unsigned char* xonly_pk32,
+    const unsigned char* algo,
     size_t algolen,
-    void *data
-);
+    void* data);
 
 /** An implementation of the nonce generation function as defined in Bitcoin
  *  Improvement Proposal 340 "Schnorr Signatures for secp256k1"
@@ -85,12 +84,11 @@ typedef struct {
     void* ndata;
 } secp256k1_schnorrsig_extraparams;
 
-#define SECP256K1_SCHNORRSIG_EXTRAPARAMS_MAGIC { 0xda, 0x6f, 0xb3, 0x8c }
-#define SECP256K1_SCHNORRSIG_EXTRAPARAMS_INIT {\
-    SECP256K1_SCHNORRSIG_EXTRAPARAMS_MAGIC,\
-    NULL,\
-    NULL\
-}
+#define SECP256K1_SCHNORRSIG_EXTRAPARAMS_MAGIC {0xda, 0x6f, 0xb3, 0x8c}
+#define SECP256K1_SCHNORRSIG_EXTRAPARAMS_INIT { \
+    SECP256K1_SCHNORRSIG_EXTRAPARAMS_MAGIC,     \
+    NULL,                                       \
+    NULL}
 
 /** Create a Schnorr signature.
  *
@@ -118,22 +116,20 @@ typedef struct {
  */
 SECP256K1_API int secp256k1_schnorrsig_sign32(
     const secp256k1_context* ctx,
-    unsigned char *sig64,
-    const unsigned char *msg32,
-    const secp256k1_keypair *keypair,
-    const unsigned char *aux_rand32
-) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4);
+    unsigned char* sig64,
+    const unsigned char* msg32,
+    const secp256k1_keypair* keypair,
+    const unsigned char* aux_rand32) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4);
 
 /** Same as secp256k1_schnorrsig_sign32, but DEPRECATED. Will be removed in
  *  future versions. */
 SECP256K1_API int secp256k1_schnorrsig_sign(
     const secp256k1_context* ctx,
-    unsigned char *sig64,
-    const unsigned char *msg32,
-    const secp256k1_keypair *keypair,
-    const unsigned char *aux_rand32
-) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4)
-  SECP256K1_DEPRECATED("Use secp256k1_schnorrsig_sign32 instead");
+    unsigned char* sig64,
+    const unsigned char* msg32,
+    const secp256k1_keypair* keypair,
+    const unsigned char* aux_rand32) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4)
+    SECP256K1_DEPRECATED("Use secp256k1_schnorrsig_sign32 instead");
 
 /** Create a Schnorr signature with a more flexible API.
  *
@@ -150,12 +146,11 @@ SECP256K1_API int secp256k1_schnorrsig_sign(
  */
 SECP256K1_API int secp256k1_schnorrsig_sign_custom(
     const secp256k1_context* ctx,
-    unsigned char *sig64,
-    const unsigned char *msg,
+    unsigned char* sig64,
+    const unsigned char* msg,
     size_t msglen,
-    const secp256k1_keypair *keypair,
-    secp256k1_schnorrsig_extraparams *extraparams
-) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(5);
+    const secp256k1_keypair* keypair,
+    secp256k1_schnorrsig_extraparams* extraparams) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(5);
 
 /** Verify a Schnorr signature.
  *
@@ -169,11 +164,10 @@ SECP256K1_API int secp256k1_schnorrsig_sign_custom(
  */
 SECP256K1_API SECP256K1_WARN_UNUSED_RESULT int secp256k1_schnorrsig_verify(
     const secp256k1_context* ctx,
-    const unsigned char *sig64,
-    const unsigned char *msg,
+    const unsigned char* sig64,
+    const unsigned char* msg,
     size_t msglen,
-    const secp256k1_xonly_pubkey *pubkey
-) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(5);
+    const secp256k1_xonly_pubkey* pubkey) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(5);
 
 #ifdef __cplusplus
 }

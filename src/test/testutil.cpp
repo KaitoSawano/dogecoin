@@ -10,7 +10,8 @@
 #include <shlobj.h>
 #endif
 
-fs::path GetTempPath() {
+fs::path GetTempPath()
+{
 #if BOOST_FILESYSTEM_VERSION == 3
     return fs::temp_directory_path();
 #else

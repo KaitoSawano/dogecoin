@@ -87,7 +87,8 @@ __asm(".symver exp_old,exp@GLIBC_2.4");
 #elif defined(__aarch64__)
 __asm(".symver exp_old,exp@GLIBC_2.17");
 #endif
-extern "C" double __wrap_exp(double x) {
+extern "C" double __wrap_exp(double x)
+{
     return exp_old(x);
 }
 
@@ -101,7 +102,8 @@ __asm(".symver log_old,log@GLIBC_2.4");
 #elif defined(__aarch64__)
 __asm(".symver log_old,log@GLIBC_2.17");
 #endif
-extern "C" double __wrap_log(double x) {
+extern "C" double __wrap_log(double x)
+{
     return log_old(x);
 }
 
@@ -115,11 +117,12 @@ __asm(".symver pow_old,pow@GLIBC_2.4");
 #elif defined(__aarch64__)
 __asm(".symver pow_old,pow@GLIBC_2.17");
 #endif
-extern "C" double __wrap_pow(double x, double y) {
-    return pow_old(x,y);
+extern "C" double __wrap_pow(double x, double y)
+{
+    return pow_old(x, y);
 }
 
-extern "C" int clock_gettime_old(clockid_t a, struct timespec *b);
+extern "C" int clock_gettime_old(clockid_t a, struct timespec* b);
 #ifdef __i386__
 __asm(".symver clock_gettime_old,clock_gettime@GLIBC_2.2");
 #elif defined(__amd64__)
@@ -129,7 +132,8 @@ __asm(".symver clock_gettime_old,clock_gettime@GLIBC_2.4");
 #elif defined(__aarch64__)
 __asm(".symver clock_gettime_old,clock_gettime@GLIBC_2.17");
 #endif
-extern "C" int __wrap_clock_gettime(clockid_t a, struct timespec *b) {
+extern "C" int __wrap_clock_gettime(clockid_t a, struct timespec* b)
+{
     return clock_gettime_old(a, b);
 }
 
@@ -137,25 +141,27 @@ extern "C" int __wrap_clock_gettime(clockid_t a, struct timespec *b) {
 #if defined(__i386__) || defined(__arm__)
 extern "C" int fcntl_old(int fd, int cmd, ...);
 
-# if defined(__i386__)
+#if defined(__i386__)
 __asm(".symver fcntl_old,fcntl@GLIBC_2.0");
-# elif defined(__arm__)
+#elif defined(__arm__)
 __asm(".symver fcntl_old,fcntl@GLIBC_2.4");
-# endif
+#endif
 
-extern "C" int __wrap_fcntl(int fd, int cmd, ...) {
-     va_list ap;
-     va_start(ap, cmd);
-     void* arg = va_arg(ap, void*);
-     va_end(ap);
-     return fcntl_old(fd, cmd, arg);
+extern "C" int __wrap_fcntl(int fd, int cmd, ...)
+{
+    va_list ap;
+    va_start(ap, cmd);
+    void* arg = va_arg(ap, void*);
+    va_end(ap);
+    return fcntl_old(fd, cmd, arg);
 }
 
-extern "C" int __wrap_fcntl64(int fd, int cmd, ...) {
-     va_list ap;
-     va_start(ap, cmd);
-     void* arg = va_arg(ap, void*);
-     va_end(ap);
-     return fcntl_old(fd, cmd, arg);
+extern "C" int __wrap_fcntl64(int fd, int cmd, ...)
+{
+    va_list ap;
+    va_start(ap, cmd);
+    void* arg = va_arg(ap, void*);
+    va_end(ap);
+    return fcntl_old(fd, cmd, arg);
 }
-#endif //defined(__i386__) || defined(__arm__)
+#endif // defined(__i386__) || defined(__arm__)

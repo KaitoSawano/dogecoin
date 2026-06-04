@@ -11,69 +11,68 @@
 #include <string.h>
 
 #if (defined(__ia64__) || defined(__x86_64__)) && \
-    !defined(__APPLE__) && \
+    !defined(__APPLE__) &&                        \
     (defined(USE_AVX2))
 #include <intel-ipsec-mb.h>
 #endif
 
 #if defined(__arm__) || defined(__aarch32__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM)
-# if defined(__GNUC__)
-#  include <stdint.h>
-# endif
-# if defined(__ARM_NEON) || defined(_MSC_VER) || defined(__GNUC__)
-#  include <arm_neon.h>
-# endif
+#if defined(__GNUC__)
+#include <stdint.h>
+#endif
+#if defined(__ARM_NEON) || defined(_MSC_VER) || defined(__GNUC__)
+#include <arm_neon.h>
+#endif
 /** GCC and LLVM Clang, but not Apple Clang */
-# if defined(__GNUC__) && !defined(__apple_build_version__)
-#  if defined(__ARM_ACLE) || defined(__ARM_FEATURE_CRYPTO)
-#   include "compat/arm_acle_selector.h"
-#  endif
-# endif
-#endif  /** ARM Headers */
+#if defined(__GNUC__) && !defined(__apple_build_version__)
+#if defined(__ARM_ACLE) || defined(__ARM_FEATURE_CRYPTO)
+#include "compat/arm_acle_selector.h"
+#endif
+#endif
+#endif /** ARM Headers */
 
 static const uint64_t sha512_round_constants[] =
-{
-    0x428a2f98d728ae22, 0x7137449123ef65cd,
-    0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
-    0x3956c25bf348b538, 0x59f111f1b605d019,
-    0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
-    0xd807aa98a3030242, 0x12835b0145706fbe,
-    0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,
-    0x72be5d74f27b896f, 0x80deb1fe3b1696b1,
-    0x9bdc06a725c71235, 0xc19bf174cf692694,
-    0xe49b69c19ef14ad2, 0xefbe4786384f25e3,
-    0x0fc19dc68b8cd5b5, 0x240ca1cc77ac9c65,
-    0x2de92c6f592b0275, 0x4a7484aa6ea6e483,
-    0x5cb0a9dcbd41fbd4, 0x76f988da831153b5,
-    0x983e5152ee66dfab, 0xa831c66d2db43210,
-    0xb00327c898fb213f, 0xbf597fc7beef0ee4,
-    0xc6e00bf33da88fc2, 0xd5a79147930aa725,
-    0x06ca6351e003826f, 0x142929670a0e6e70,
-    0x27b70a8546d22ffc, 0x2e1b21385c26c926,
-    0x4d2c6dfc5ac42aed, 0x53380d139d95b3df,
-    0x650a73548baf63de, 0x766a0abb3c77b2a8,
-    0x81c2c92e47edaee6, 0x92722c851482353b,
-    0xa2bfe8a14cf10364, 0xa81a664bbc423001,
-    0xc24b8b70d0f89791, 0xc76c51a30654be30,
-    0xd192e819d6ef5218, 0xd69906245565a910,
-    0xf40e35855771202a, 0x106aa07032bbd1b8,
-    0x19a4c116b8d2d0c8, 0x1e376c085141ab53,
-    0x2748774cdf8eeb99, 0x34b0bcb5e19b48a8,
-    0x391c0cb3c5c95a63, 0x4ed8aa4ae3418acb,
-    0x5b9cca4f7763e373, 0x682e6ff3d6b2b8a3,
-    0x748f82ee5defb2fc, 0x78a5636f43172f60,
-    0x84c87814a1f0ab72, 0x8cc702081a6439ec,
-    0x90befffa23631e28, 0xa4506cebde82bde9,
-    0xbef9a3f7b2c67915, 0xc67178f2e372532b,
-    0xca273eceea26619c, 0xd186b8c721c0c207,
-    0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178,
-    0x06f067aa72176fba, 0x0a637dc5a2c898a6,
-    0x113f9804bef90dae, 0x1b710b35131c471b,
-    0x28db77f523047d84, 0x32caab7b40c72493,
-    0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
-    0x4cc5d4becb3e42b6, 0x597f299cfc657e2a,
-    0x5fcb6fab3ad6faec, 0x6c44198c4a475817
-};
+    {
+        0x428a2f98d728ae22, 0x7137449123ef65cd,
+        0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
+        0x3956c25bf348b538, 0x59f111f1b605d019,
+        0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
+        0xd807aa98a3030242, 0x12835b0145706fbe,
+        0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,
+        0x72be5d74f27b896f, 0x80deb1fe3b1696b1,
+        0x9bdc06a725c71235, 0xc19bf174cf692694,
+        0xe49b69c19ef14ad2, 0xefbe4786384f25e3,
+        0x0fc19dc68b8cd5b5, 0x240ca1cc77ac9c65,
+        0x2de92c6f592b0275, 0x4a7484aa6ea6e483,
+        0x5cb0a9dcbd41fbd4, 0x76f988da831153b5,
+        0x983e5152ee66dfab, 0xa831c66d2db43210,
+        0xb00327c898fb213f, 0xbf597fc7beef0ee4,
+        0xc6e00bf33da88fc2, 0xd5a79147930aa725,
+        0x06ca6351e003826f, 0x142929670a0e6e70,
+        0x27b70a8546d22ffc, 0x2e1b21385c26c926,
+        0x4d2c6dfc5ac42aed, 0x53380d139d95b3df,
+        0x650a73548baf63de, 0x766a0abb3c77b2a8,
+        0x81c2c92e47edaee6, 0x92722c851482353b,
+        0xa2bfe8a14cf10364, 0xa81a664bbc423001,
+        0xc24b8b70d0f89791, 0xc76c51a30654be30,
+        0xd192e819d6ef5218, 0xd69906245565a910,
+        0xf40e35855771202a, 0x106aa07032bbd1b8,
+        0x19a4c116b8d2d0c8, 0x1e376c085141ab53,
+        0x2748774cdf8eeb99, 0x34b0bcb5e19b48a8,
+        0x391c0cb3c5c95a63, 0x4ed8aa4ae3418acb,
+        0x5b9cca4f7763e373, 0x682e6ff3d6b2b8a3,
+        0x748f82ee5defb2fc, 0x78a5636f43172f60,
+        0x84c87814a1f0ab72, 0x8cc702081a6439ec,
+        0x90befffa23631e28, 0xa4506cebde82bde9,
+        0xbef9a3f7b2c67915, 0xc67178f2e372532b,
+        0xca273eceea26619c, 0xd186b8c721c0c207,
+        0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178,
+        0x06f067aa72176fba, 0x0a637dc5a2c898a6,
+        0x113f9804bef90dae, 0x1b710b35131c471b,
+        0x28db77f523047d84, 0x32caab7b40c72493,
+        0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
+        0x4cc5d4becb3e42b6, 0x597f299cfc657e2a,
+        0x5fcb6fab3ad6faec, 0x6c44198c4a475817};
 
 // Internal implementation code.
 namespace
@@ -112,13 +111,17 @@ struct sha512_neon_core {
     uint64x2_t ab, cd, ef, gh;
 };
 
-static inline uint64x2_t sha512_neon_load_input(const uint8_t *p)
+static inline uint64x2_t sha512_neon_load_input(const uint8_t* p)
 {
     return vreinterpretq_u64_u8(vrev64q_u8(vld1q_u8(p)));
 }
 
 static inline uint64x2_t sha512_neon_schedule_update(
-    uint64x2_t m8, uint64x2_t m7, uint64x2_t m4, uint64x2_t m3, uint64x2_t m1)
+    uint64x2_t m8,
+    uint64x2_t m7,
+    uint64x2_t m4,
+    uint64x2_t m3,
+    uint64x2_t m1)
 {
     /*
      * vsha512su0q_u64() takes words from a long way back in the
@@ -138,8 +141,12 @@ static inline uint64x2_t sha512_neon_schedule_update(
 }
 
 static inline void sha512_neon_round2(
-    unsigned round_index, uint64x2_t schedule_words,
-    uint64x2_t *ab, uint64x2_t *cd, uint64x2_t *ef, uint64x2_t *gh)
+    unsigned round_index,
+    uint64x2_t schedule_words,
+    uint64x2_t* ab,
+    uint64x2_t* cd,
+    uint64x2_t* ef,
+    uint64x2_t* gh)
 {
     /*
      * vsha512hq_u64 performs the Sigma_1 and Ch half of the
@@ -202,27 +209,27 @@ static inline void sha512_neon_round2(
     *cd = vaddq_u64(*cd, intermed);
 }
 
-static inline void sha512_neon_block(sha512_neon_core *core, const uint8_t *p)
+static inline void sha512_neon_block(sha512_neon_core* core, const uint8_t* p)
 {
     uint64x2_t s0, s1, s2, s3, s4, s5, s6, s7;
 
     uint64x2_t ab = core->ab, cd = core->cd, ef = core->ef, gh = core->gh;
 
-    s0 = sha512_neon_load_input(p + 16*0);
+    s0 = sha512_neon_load_input(p + 16 * 0);
     sha512_neon_round2(0, s0, &ab, &cd, &ef, &gh);
-    s1 = sha512_neon_load_input(p + 16*1);
+    s1 = sha512_neon_load_input(p + 16 * 1);
     sha512_neon_round2(2, s1, &gh, &ab, &cd, &ef);
-    s2 = sha512_neon_load_input(p + 16*2);
+    s2 = sha512_neon_load_input(p + 16 * 2);
     sha512_neon_round2(4, s2, &ef, &gh, &ab, &cd);
-    s3 = sha512_neon_load_input(p + 16*3);
+    s3 = sha512_neon_load_input(p + 16 * 3);
     sha512_neon_round2(6, s3, &cd, &ef, &gh, &ab);
-    s4 = sha512_neon_load_input(p + 16*4);
+    s4 = sha512_neon_load_input(p + 16 * 4);
     sha512_neon_round2(8, s4, &ab, &cd, &ef, &gh);
-    s5 = sha512_neon_load_input(p + 16*5);
+    s5 = sha512_neon_load_input(p + 16 * 5);
     sha512_neon_round2(10, s5, &gh, &ab, &cd, &ef);
-    s6 = sha512_neon_load_input(p + 16*6);
+    s6 = sha512_neon_load_input(p + 16 * 6);
     sha512_neon_round2(12, s6, &ef, &gh, &ab, &cd);
-    s7 = sha512_neon_load_input(p + 16*7);
+    s7 = sha512_neon_load_input(p + 16 * 7);
     sha512_neon_round2(14, s7, &cd, &ef, &gh, &ab);
     s0 = sha512_neon_schedule_update(s0, s1, s4, s5, s7);
     sha512_neon_round2(16, s0, &ab, &cd, &ef, &gh);
@@ -320,21 +327,21 @@ void Transform(uint64_t* s, const unsigned char* chunk)
     sha512_neon_core core;
 
     core.ab = vld1q_u64(s);
-    core.cd = vld1q_u64(s+2);
-    core.ef = vld1q_u64(s+4);
-    core.gh = vld1q_u64(s+6);
+    core.cd = vld1q_u64(s + 2);
+    core.ef = vld1q_u64(s + 4);
+    core.gh = vld1q_u64(s + 6);
 
     // Perform SHA512 one block (ARMv8.2)
     sha512_neon_block(&core, chunk);
 
-    s[0] = vgetq_lane_u64 (core.ab, 0);
-    s[1] = vgetq_lane_u64 (core.ab, 1);
-    s[2] = vgetq_lane_u64 (core.cd, 0);
-    s[3] = vgetq_lane_u64 (core.cd, 1);
-    s[4] = vgetq_lane_u64 (core.ef, 0);
-    s[5] = vgetq_lane_u64 (core.ef, 1);
-    s[6] = vgetq_lane_u64 (core.gh, 0);
-    s[7] = vgetq_lane_u64 (core.gh, 1);
+    s[0] = vgetq_lane_u64(core.ab, 0);
+    s[1] = vgetq_lane_u64(core.ab, 1);
+    s[2] = vgetq_lane_u64(core.cd, 0);
+    s[3] = vgetq_lane_u64(core.cd, 1);
+    s[4] = vgetq_lane_u64(core.ef, 0);
+    s[5] = vgetq_lane_u64(core.ef, 1);
+    s[6] = vgetq_lane_u64(core.gh, 0);
+    s[7] = vgetq_lane_u64(core.gh, 1);
 #else
     // Perform SHA512 one block (legacy)
     uint64_t a = s[0], b = s[1], c = s[2], d = s[3], e = s[4], f = s[5], g = s[6], h = s[7];

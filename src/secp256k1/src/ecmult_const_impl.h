@@ -7,10 +7,10 @@
 #ifndef SECP256K1_ECMULT_CONST_IMPL_H
 #define SECP256K1_ECMULT_CONST_IMPL_H
 
-#include "scalar.h"
-#include "group.h"
 #include "ecmult_const.h"
 #include "ecmult_impl.h"
+#include "group.h"
+#include "scalar.h"
 
 /** Fill a table 'pre' with precomputed odd multiples of a.
  *
@@ -18,7 +18,8 @@
  *  coordinates as ge_storage points in pre, and stores the global Z in globalz.
  *  It only operates on tables sized for WINDOW_A wnaf multiples.
  */
-static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge *pre, secp256k1_fe *globalz, const secp256k1_gej *a) {
+static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge* pre, secp256k1_fe* globalz, const secp256k1_gej* a)
+{
     secp256k1_fe zr[ECMULT_TABLE_SIZE(WINDOW_A)];
 
     secp256k1_ecmult_odd_multiples_table(ECMULT_TABLE_SIZE(WINDOW_A), pre, zr, globalz, a);
@@ -26,32 +27,33 @@ static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge *p
 }
 
 /* This is like `ECMULT_TABLE_GET_GE` but is constant time */
-#define ECMULT_CONST_TABLE_GET_GE(r,pre,n,w) do { \
-    int m = 0; \
-    /* Extract the sign-bit for a constant time absolute-value. */ \
-    int mask = (n) >> (sizeof(n) * CHAR_BIT - 1); \
-    int abs_n = ((n) + mask) ^ mask; \
-    int idx_n = abs_n >> 1; \
-    secp256k1_fe neg_y; \
-    VERIFY_CHECK(((n) & 1) == 1); \
-    VERIFY_CHECK((n) >= -((1 << ((w)-1)) - 1)); \
-    VERIFY_CHECK((n) <=  ((1 << ((w)-1)) - 1)); \
-    VERIFY_SETUP(secp256k1_fe_clear(&(r)->x)); \
-    VERIFY_SETUP(secp256k1_fe_clear(&(r)->y)); \
-    /* Unconditionally set r->x = (pre)[m].x. r->y = (pre)[m].y. because it's either the correct one \
-     * or will get replaced in the later iterations, this is needed to make sure `r` is initialized. */ \
-    (r)->x = (pre)[m].x; \
-    (r)->y = (pre)[m].y; \
-    for (m = 1; m < ECMULT_TABLE_SIZE(w); m++) { \
-        /* This loop is used to avoid secret data in array indices. See
-         * the comment in ecmult_gen_impl.h for rationale. */ \
-        secp256k1_fe_cmov(&(r)->x, &(pre)[m].x, m == idx_n); \
-        secp256k1_fe_cmov(&(r)->y, &(pre)[m].y, m == idx_n); \
-    } \
-    (r)->infinity = 0; \
-    secp256k1_fe_negate(&neg_y, &(r)->y, 1); \
-    secp256k1_fe_cmov(&(r)->y, &neg_y, (n) != abs_n); \
-} while(0)
+#define ECMULT_CONST_TABLE_GET_GE(r, pre, n, w)                                                             \
+    do {                                                                                                    \
+        int m = 0;                                                                                          \
+        /* Extract the sign-bit for a constant time absolute-value. */                                      \
+        int mask = (n) >> (sizeof(n) * CHAR_BIT - 1);                                                       \
+        int abs_n = ((n) + mask) ^ mask;                                                                    \
+        int idx_n = abs_n >> 1;                                                                             \
+        secp256k1_fe neg_y;                                                                                 \
+        VERIFY_CHECK(((n) & 1) == 1);                                                                       \
+        VERIFY_CHECK((n) >= -((1 << ((w) - 1)) - 1));                                                       \
+        VERIFY_CHECK((n) <= ((1 << ((w) - 1)) - 1));                                                        \
+        VERIFY_SETUP(secp256k1_fe_clear(&(r)->x));                                                          \
+        VERIFY_SETUP(secp256k1_fe_clear(&(r)->y));                                                          \
+        /* Unconditionally set r->x = (pre)[m].x. r->y = (pre)[m].y. because it's either the correct one    \
+         * or will get replaced in the later iterations, this is needed to make sure `r` is initialized. */ \
+        (r)->x = (pre)[m].x;                                                                                \
+        (r)->y = (pre)[m].y;                                                                                \
+        for (m = 1; m < ECMULT_TABLE_SIZE(w); m++) {                                                        \
+            /* This loop is used to avoid secret data in array indices. See                                 \
+             * the comment in ecmult_gen_impl.h for rationale. */                                           \
+            secp256k1_fe_cmov(&(r)->x, &(pre)[m].x, m == idx_n);                                            \
+            secp256k1_fe_cmov(&(r)->y, &(pre)[m].y, m == idx_n);                                            \
+        }                                                                                                   \
+        (r)->infinity = 0;                                                                                  \
+        secp256k1_fe_negate(&neg_y, &(r)->y, 1);                                                            \
+        secp256k1_fe_cmov(&(r)->y, &neg_y, (n) != abs_n);                                                   \
+    } while (0)
 
 /** Convert a number to WNAF notation.
  *  The number becomes represented by sum(2^{wi} * wnaf[i], i=0..WNAF_SIZE(w)+1) - return_val.
@@ -66,7 +68,8 @@ static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge *p
  *
  *  Numbers reference steps of `Algorithm SPA-resistant Width-w NAF with Odd Scalar` on pp. 335
  */
-static int secp256k1_wnaf_const(int *wnaf, const secp256k1_scalar *scalar, int w, int size) {
+static int secp256k1_wnaf_const(int* wnaf, const secp256k1_scalar* scalar, int w, int size)
+{
     int global_sign;
     int skew;
     int word = 0;
@@ -130,7 +133,8 @@ static int secp256k1_wnaf_const(int *wnaf, const secp256k1_scalar *scalar, int w
     return skew;
 }
 
-static void secp256k1_ecmult_const(secp256k1_gej *r, const secp256k1_ge *a, const secp256k1_scalar *scalar, int size) {
+static void secp256k1_ecmult_const(secp256k1_gej* r, const secp256k1_ge* a, const secp256k1_scalar* scalar, int size)
+{
     secp256k1_ge pre_a[ECMULT_TABLE_SIZE(WINDOW_A)];
     secp256k1_ge tmpa;
     secp256k1_fe Z;
@@ -150,11 +154,10 @@ static void secp256k1_ecmult_const(secp256k1_gej *r, const secp256k1_ge *a, cons
         rsize = 128;
         /* split q into q_1 and q_lam (where q = q_1 + q_lam*lambda, and q_1 and q_lam are ~128 bit) */
         secp256k1_scalar_split_lambda(&q_1, &q_lam, scalar);
-        skew_1   = secp256k1_wnaf_const(wnaf_1,   &q_1,   WINDOW_A - 1, 128);
+        skew_1 = secp256k1_wnaf_const(wnaf_1, &q_1, WINDOW_A - 1, 128);
         skew_lam = secp256k1_wnaf_const(wnaf_lam, &q_lam, WINDOW_A - 1, 128);
-    } else
-    {
-        skew_1   = secp256k1_wnaf_const(wnaf_1, scalar, WINDOW_A - 1, size);
+    } else {
+        skew_1 = secp256k1_wnaf_const(wnaf_1, scalar, WINDOW_A - 1, size);
         skew_lam = 0;
     }
 
@@ -174,7 +177,6 @@ static void secp256k1_ecmult_const(secp256k1_gej *r, const secp256k1_ge *a, cons
         for (i = 0; i < ECMULT_TABLE_SIZE(WINDOW_A); i++) {
             secp256k1_ge_mul_lambda(&pre_a_lam[i], &pre_a[i]);
         }
-
     }
 
     /* first loop iteration (separated out so we can directly set r, rather

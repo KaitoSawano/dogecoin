@@ -7,11 +7,10 @@
 #include "policy/policy.h"
 #include "wallet/wallet.h"
 
-WalletModelTransaction::WalletModelTransaction(const QList<SendCoinsRecipient> &_recipients) :
-    recipients(_recipients),
-    walletTransaction(0),
-    keyChange(0),
-    fee(0)
+WalletModelTransaction::WalletModelTransaction(const QList<SendCoinsRecipient>& _recipients) : recipients(_recipients),
+                                                                                               walletTransaction(0),
+                                                                                               keyChange(0),
+                                                                                               fee(0)
 {
     walletTransaction = new CWalletTx();
 }
@@ -27,7 +26,7 @@ QList<SendCoinsRecipient> WalletModelTransaction::getRecipients()
     return recipients;
 }
 
-CWalletTx *WalletModelTransaction::getTransaction()
+CWalletTx* WalletModelTransaction::getTransaction()
 {
     return walletTransaction;
 }
@@ -50,8 +49,7 @@ void WalletModelTransaction::setTransactionFee(const CAmount& newFee)
 void WalletModelTransaction::reassignAmounts(int nChangePosRet)
 {
     int i = 0;
-    for (QList<SendCoinsRecipient>::iterator it = recipients.begin(); it != recipients.end(); ++it)
-    {
+    for (QList<SendCoinsRecipient>::iterator it = recipients.begin(); it != recipients.end(); ++it) {
         SendCoinsRecipient& rcp = (*it);
 
         if (i == nChangePosRet)
@@ -64,19 +62,18 @@ void WalletModelTransaction::reassignAmounts(int nChangePosRet)
 CAmount WalletModelTransaction::getTotalTransactionAmount()
 {
     CAmount totalTransactionAmount = 0;
-    Q_FOREACH(const SendCoinsRecipient &rcp, recipients)
-    {
+    Q_FOREACH (const SendCoinsRecipient& rcp, recipients) {
         totalTransactionAmount += rcp.amount;
     }
     return totalTransactionAmount;
 }
 
-void WalletModelTransaction::newPossibleKeyChange(CWallet *wallet)
+void WalletModelTransaction::newPossibleKeyChange(CWallet* wallet)
 {
     keyChange = new CReserveKey(wallet);
 }
 
-CReserveKey *WalletModelTransaction::getPossibleKeyChange()
+CReserveKey* WalletModelTransaction::getPossibleKeyChange()
 {
     return keyChange;
 }

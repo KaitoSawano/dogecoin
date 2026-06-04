@@ -56,7 +56,7 @@ class PaymentServer : public QObject
 public:
     // Parse URIs on command line
     // Returns false on error
-    static void ipcParseCommandLine(int argc, char *argv[]);
+    static void ipcParseCommandLine(int argc, char* argv[]);
 
     // Returns true if there were URIs on the command line
     // which were successfully sent to an already-running
@@ -70,7 +70,7 @@ public:
     PaymentServer(QObject* parent, QString ipcServerName, bool startLocalServer = true);
 
     // OptionsModel is used for getting proxy settings and display unit
-    void setOptionsModel(OptionsModel *optionsModel);
+    void setOptionsModel(OptionsModel* optionsModel);
 
     // Verify the payment request amount is valid
     static bool verifyAmount(const CAmount& requestAmount);
@@ -80,7 +80,7 @@ Q_SIGNALS:
     void receivedPaymentRequest(SendCoinsRecipient);
 
     // Fired when a message should be reported to the user
-    void message(const QString &title, const QString &message, unsigned int style);
+    void message(const QString& title, const QString& message, unsigned int style);
 
 public Q_SLOTS:
     // Signal this when the main window's UI is ready
@@ -96,15 +96,15 @@ private Q_SLOTS:
 protected:
     // Constructor registers this on the parent QApplication to
     // receive QEvent::FileOpen and QEvent:Drop events
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
 private:
-    bool saveURIs;                      // true during startup
+    bool saveURIs; // true during startup
 
     void initializeServer(QObject* parent, QString ipcServerName, bool startLocalServer, bool enableBip70Flag);
     QLocalServer* uriServer;
 
-    OptionsModel *optionsModel;
+    OptionsModel* optionsModel;
 };
 
 #endif // BITCOIN_QT_PAYMENTSERVER_H

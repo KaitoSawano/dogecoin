@@ -11,10 +11,10 @@ BOOST_FIXTURE_TEST_SUITE(sync_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(potential_deadlock_detected)
 {
-    #ifdef DEBUG_LOCKORDER
+#ifdef DEBUG_LOCKORDER
     bool prev = g_debug_lockorder_abort;
     g_debug_lockorder_abort = false;
-    #endif
+#endif
 
     CCriticalSection mutex1, mutex2;
     {
@@ -27,15 +27,15 @@ BOOST_AUTO_TEST_CASE(potential_deadlock_detected)
         BOOST_CHECK_EQUAL(e.what(), "potential deadlock detected");
         error_thrown = true;
     }
-    #ifdef DEBUG_LOCKORDER
+#ifdef DEBUG_LOCKORDER
     BOOST_CHECK(error_thrown);
-    #else
+#else
     BOOST_CHECK(!error_thrown);
-    #endif
+#endif
 
-    #ifdef DEBUG_LOCKORDER
+#ifdef DEBUG_LOCKORDER
     g_debug_lockorder_abort = prev;
-    #endif
+#endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()

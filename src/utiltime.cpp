@@ -48,7 +48,8 @@ int64_t GetMockTime()
 int64_t GetTimeMillis()
 {
     int64_t now = (boost::posix_time::microsec_clock::universal_time() -
-                   boost::posix_time::ptime(boost::gregorian::date(1970,1,1))).total_milliseconds();
+                   boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1)))
+                      .total_milliseconds();
     assert(now > 0);
     return now;
 }
@@ -56,20 +57,21 @@ int64_t GetTimeMillis()
 int64_t GetTimeMicros()
 {
     int64_t now = (boost::posix_time::microsec_clock::universal_time() -
-                   boost::posix_time::ptime(boost::gregorian::date(1970,1,1))).total_microseconds();
+                   boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1)))
+                      .total_microseconds();
     assert(now > 0);
     return now;
 }
 
 int64_t GetSystemTimeInSeconds()
 {
-    return GetTimeMicros()/1000000;
+    return GetTimeMicros() / 1000000;
 }
 
 /** Return a time useful for the debug log */
 int64_t GetLogTimeMicros()
 {
-    if (nMockTime) return nMockTime*1000000;
+    if (nMockTime) return nMockTime * 1000000;
 
     return GetTimeMicros();
 }

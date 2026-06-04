@@ -14,7 +14,8 @@ BOOST_FIXTURE_TEST_SUITE(dogecoin_tests, TestingSetup)
 /**
  * the maximum block reward at a given height for a block without fees
  */
-uint64_t expectedMaxSubsidy(int height) {
+uint64_t expectedMaxSubsidy(int height)
+{
     if (height < 100000) {
         return 1000000 * COIN;
     } else if (height < 145000) {
@@ -24,13 +25,13 @@ uint64_t expectedMaxSubsidy(int height) {
     } else if (height < 300000) {
         return 125000 * COIN;
     } else if (height < 400000) {
-        return  62500 * COIN;
+        return 62500 * COIN;
     } else if (height < 500000) {
-        return  31250 * COIN;
+        return 31250 * COIN;
     } else if (height < 600000) {
-        return  15625 * COIN;
+        return 15625 * COIN;
     } else {
-        return  10000 * COIN;
+        return 10000 * COIN;
     }
 }
 
@@ -38,7 +39,8 @@ uint64_t expectedMaxSubsidy(int height) {
  * the minimum possible value for the maximum block reward at a given height
  * for a block without fees
  */
-uint64_t expectedMinSubsidy(int height) {
+uint64_t expectedMinSubsidy(int height)
+{
     if (height < 100000) {
         return 0;
     } else if (height < 145000) {
@@ -48,13 +50,13 @@ uint64_t expectedMinSubsidy(int height) {
     } else if (height < 300000) {
         return 125000 * COIN;
     } else if (height < 400000) {
-        return  62500 * COIN;
+        return 62500 * COIN;
     } else if (height < 500000) {
-        return  31250 * COIN;
+        return 31250 * COIN;
     } else if (height < 600000) {
-        return  15625 * COIN;
+        return 15625 * COIN;
     } else {
-        return  10000 * COIN;
+        return 10000 * COIN;
     }
 }
 

@@ -76,8 +76,7 @@ static QList<QString> savedPaymentRequests;
 //
 void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
 {
-    for (int i = 1; i < argc; i++)
-    {
+    for (int i = 1; i < argc; i++) {
         QString arg(argv[i]);
         if (arg.startsWith("-"))
             continue;
@@ -91,22 +90,16 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
             savedPaymentRequests.append(arg);
 
             SendCoinsRecipient r;
-            if (GUIUtil::parseBitcoinURI(arg, &r) && !r.address.isEmpty())
-            {
+            if (GUIUtil::parseBitcoinURI(arg, &r) && !r.address.isEmpty()) {
                 CBitcoinAddress address(r.address.toStdString());
 
-                if (address.IsValid(Params(CBaseChainParams::MAIN)))
-                {
+                if (address.IsValid(Params(CBaseChainParams::MAIN))) {
                     SelectParams(CBaseChainParams::MAIN);
-                }
-                else if (address.IsValid(Params(CBaseChainParams::TESTNET)))
-                {
+                } else if (address.IsValid(Params(CBaseChainParams::TESTNET))) {
                     SelectParams(CBaseChainParams::TESTNET);
                 }
             }
-        }
-        else
-        {
+        } else {
             // Printing to debug.log is about the best we can do here, the
             // GUI hasn't started yet so we can't pop up a message box.
             qWarning() << "PaymentServer::ipcSendCommandLine: Payment request file does not exist: " << arg;
@@ -123,12 +116,10 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
 bool PaymentServer::ipcSendCommandLine()
 {
     bool fResult = false;
-    Q_FOREACH (const QString& r, savedPaymentRequests)
-    {
+    Q_FOREACH (const QString& r, savedPaymentRequests) {
         QLocalSocket* socket = new QLocalSocket();
         socket->connectToServer(ipcServerName(), QIODevice::WriteOnly);
-        if (!socket->waitForConnected(BITCOIN_IPC_CONNECT_TIMEOUT))
-        {
+        if (!socket->waitForConnected(BITCOIN_IPC_CONNECT_TIMEOUT)) {
             delete socket;
             socket = NULL;
             return false;
@@ -153,42 +144,39 @@ bool PaymentServer::ipcSendCommandLine()
     return fResult;
 }
 
-void PaymentServer::initializeServer(QObject* parent, QString ipcServerName, bool startLocalServer, bool enableBip70) {
+void PaymentServer::initializeServer(QObject* parent, QString ipcServerName, bool startLocalServer, bool enableBip70)
+{
     // Install global event filter to catch QFileOpenEvents
     // on Mac: sent when you click bitcoin: links
     // other OSes: helpful when dealing with payment request files
     if (parent)
         parent->installEventFilter(this);
 
-    if (startLocalServer)
-    {
+    if (startLocalServer) {
         uriServer = new QLocalServer(this);
 
         if (!uriServer->listen(ipcServerName)) {
             // constructor is called early in init, so don't use "Q_EMIT message()" here
             QMessageBox::critical(0, tr("Payment request error"),
                 tr("Cannot start dogecoin: click-to-pay handler"));
-        }
-        else {
+        } else {
             connect(uriServer, SIGNAL(newConnection()), this, SLOT(handleURIConnection()));
         }
     }
 }
 
-PaymentServer::PaymentServer(QObject* parent, bool startLocalServer) :
-    QObject(parent),
-    saveURIs(true),
-    uriServer(0),
-    optionsModel(0)
+PaymentServer::PaymentServer(QObject* parent, bool startLocalServer) : QObject(parent),
+                                                                       saveURIs(true),
+                                                                       uriServer(0),
+                                                                       optionsModel(0)
 {
     this->initializeServer(parent, ipcServerName(), startLocalServer, false);
 }
 
-PaymentServer::PaymentServer(QObject* parent, QString ipcServerName, bool startLocalServer) :
-    QObject(parent),
-    saveURIs(true),
-    uriServer(0),
-    optionsModel(0)
+PaymentServer::PaymentServer(QObject* parent, QString ipcServerName, bool startLocalServer) : QObject(parent),
+                                                                                              saveURIs(true),
+                                                                                              uriServer(0),
+                                                                                              optionsModel(0)
 {
     this->initializeServer(parent, ipcServerName, startLocalServer, false);
 }
@@ -198,10 +186,10 @@ PaymentServer::PaymentServer(QObject* parent, QString ipcServerName, bool startL
 // Also used by paymentservertests.cpp and when opening a payment request file
 // via "Open URI..." menu entry.
 //
-bool PaymentServer::eventFilter(QObject *object, QEvent *event)
+bool PaymentServer::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::FileOpen) {
-        QFileOpenEvent *fileEvent = static_cast<QFileOpenEvent*>(event);
+        QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event);
         if (!fileEvent->file().isEmpty())
             handleURIOrFile(fileEvent->file());
         else if (!fileEvent->url().isEmpty())
@@ -216,8 +204,7 @@ bool PaymentServer::eventFilter(QObject *object, QEvent *event)
 void PaymentServer::uiReady()
 {
     saveURIs = false;
-    Q_FOREACH (const QString& s, savedPaymentRequests)
-    {
+    Q_FOREACH (const QString& s, savedPaymentRequests) {
         handleURIOrFile(s);
     }
     savedPaymentRequests.clear();
@@ -225,8 +212,7 @@ void PaymentServer::uiReady()
 
 void PaymentServer::handleURIOrFile(const QString& s)
 {
-    if (saveURIs)
-    {
+    if (saveURIs) {
         savedPaymentRequests.append(s);
         return;
     }
@@ -236,17 +222,14 @@ void PaymentServer::handleURIOrFile(const QString& s)
         QUrlQuery uri((QUrl(s)));
 
         SendCoinsRecipient recipient;
-        if (GUIUtil::parseBitcoinURI(s, &recipient))
-        {
+        if (GUIUtil::parseBitcoinURI(s, &recipient)) {
             CBitcoinAddress address(recipient.address.toStdString());
             if (!address.IsValid()) {
                 Q_EMIT message(tr("URI handling"), tr("Invalid payment address %1").arg(recipient.address),
                     CClientUIInterface::MSG_ERROR);
-            }
-            else
+            } else
                 Q_EMIT receivedPaymentRequest(recipient);
-        }
-        else
+        } else
             Q_EMIT message(tr("URI handling"),
                 tr("URI cannot be parsed! This can be caused by an invalid Dogecoin address or malformed URI parameters."),
                 CClientUIInterface::ICON_WARNING);
@@ -257,13 +240,13 @@ void PaymentServer::handleURIOrFile(const QString& s)
 
 void PaymentServer::handleURIConnection()
 {
-    QLocalSocket *clientConnection = uriServer->nextPendingConnection();
+    QLocalSocket* clientConnection = uriServer->nextPendingConnection();
 
     while (clientConnection->bytesAvailable() < (int)sizeof(quint32))
         clientConnection->waitForReadyRead();
 
     connect(clientConnection, SIGNAL(disconnected()),
-            clientConnection, SLOT(deleteLater()));
+        clientConnection, SLOT(deleteLater()));
 
     QDataStream in(clientConnection);
     in.setVersion(QDataStream::Qt_4_0);
@@ -276,7 +259,7 @@ void PaymentServer::handleURIConnection()
     handleURIOrFile(msg);
 }
 
-void PaymentServer::setOptionsModel(OptionsModel *_optionsModel)
+void PaymentServer::setOptionsModel(OptionsModel* _optionsModel)
 {
     this->optionsModel = _optionsModel;
 }
@@ -286,9 +269,9 @@ bool PaymentServer::verifyAmount(const CAmount& requestAmount)
     bool fVerified = MoneyRange(requestAmount);
     if (!fVerified) {
         qWarning() << QString("PaymentServer::%1: Payment request amount out of allowed range (%2, allowed 0 - %3).")
-            .arg(__func__)
-            .arg(requestAmount)
-            .arg(MAX_MONEY);
+                          .arg(__func__)
+                          .arg(requestAmount)
+                          .arg(MAX_MONEY);
     }
     return fVerified;
 }

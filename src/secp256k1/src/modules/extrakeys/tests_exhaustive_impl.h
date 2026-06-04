@@ -7,10 +7,11 @@
 #ifndef SECP256K1_MODULE_EXTRAKEYS_TESTS_EXHAUSTIVE_H
 #define SECP256K1_MODULE_EXTRAKEYS_TESTS_EXHAUSTIVE_H
 
-#include "src/modules/extrakeys/main_impl.h"
 #include "../../../include/secp256k1_extrakeys.h"
+#include "src/modules/extrakeys/main_impl.h"
 
-static void test_exhaustive_extrakeys(const secp256k1_context *ctx, const secp256k1_ge* group) {
+static void test_exhaustive_extrakeys(const secp256k1_context* ctx, const secp256k1_ge* group)
+{
     secp256k1_keypair keypair[EXHAUSTIVE_TEST_ORDER - 1];
     secp256k1_pubkey pubkey[EXHAUSTIVE_TEST_ORDER - 1];
     secp256k1_xonly_pubkey xonly_pubkey[EXHAUSTIVE_TEST_ORDER - 1];

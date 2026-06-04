@@ -5,8 +5,8 @@
 
 #include "pow.h"
 
-#include "auxpow.h"
 #include "arith_uint256.h"
+#include "auxpow.h"
 #include "chain.h"
 #include "dogecoin.h"
 #include "primitives/block.h"
@@ -14,7 +14,7 @@
 #include "util.h"
 
 // Determine if the for the given block, a min difficulty setting applies
-bool AllowMinDifficultyForBlock(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+bool AllowMinDifficultyForBlock(const CBlockIndex* pindexLast, const CBlockHeader* pblock, const Consensus::Params& params)
 {
     // check if the chain allows minimum difficulty blocks
     if (!params.fPowAllowMinDifficultyBlocks)
@@ -26,10 +26,10 @@ bool AllowMinDifficultyForBlock(const CBlockIndex* pindexLast, const CBlockHeade
         return false;
 
     // Allow for a minimum block time if the elapsed time > 2*nTargetSpacing
-    return (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing*2);
+    return (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing * 2);
 }
 
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, const Consensus::Params& params)
 {
     unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
 
@@ -38,8 +38,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return nProofOfWorkLimit;
 
     // Dogecoin: Special rules for minimum difficulty blocks with Digishield
-    if (AllowDigishieldMinDifficultyForBlock(pindexLast, pblock, params))
-    {
+    if (AllowDigishieldMinDifficultyForBlock(pindexLast, pblock, params)) {
         // Special difficulty rule for testnet:
         // If the new block's timestamp is more than 2* nTargetSpacing minutes
         // then allow mining of a min-difficulty block.
@@ -48,20 +47,15 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
     // Only change once per difficulty adjustment interval
     bool fNewDifficultyProtocol = (pindexLast->nHeight >= 145000);
-    const int64_t difficultyAdjustmentInterval = fNewDifficultyProtocol
-                                                 ? 1
-                                                 : params.DifficultyAdjustmentInterval();
-    if ((pindexLast->nHeight+1) % difficultyAdjustmentInterval != 0)
-    {
-        if (params.fPowAllowMinDifficultyBlocks)
-        {
+    const int64_t difficultyAdjustmentInterval = fNewDifficultyProtocol ? 1 : params.DifficultyAdjustmentInterval();
+    if ((pindexLast->nHeight + 1) % difficultyAdjustmentInterval != 0) {
+        if (params.fPowAllowMinDifficultyBlocks) {
             // Special difficulty rule for testnet:
             // If the new block's timestamp is more than 2* 10 minutes
             // then allow mining of a min-difficulty block.
-            if (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing*2)
+            if (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing * 2)
                 return nProofOfWorkLimit;
-            else
-            {
+            else {
                 // Return the last non-special-min-difficulty-rules-block
                 const CBlockIndex* pindex = pindexLast;
                 while (pindex->pprev && pindex->nHeight % params.DifficultyAdjustmentInterval() != 0 && pindex->nBits == nProofOfWorkLimit)
@@ -74,8 +68,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
     // Litecoin: This fixes an issue where a 51% attack can change difficulty at will.
     // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
-    int blockstogoback = difficultyAdjustmentInterval-1;
-    if ((pindexLast->nHeight+1) != difficultyAdjustmentInterval)
+    int blockstogoback = difficultyAdjustmentInterval - 1;
+    if ((pindexLast->nHeight + 1) != difficultyAdjustmentInterval)
         blockstogoback = difficultyAdjustmentInterval;
 
     // Go back by what we want to be 14 days worth of blocks
@@ -94,10 +88,10 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
 
     // Limit adjustment step
     int64_t nActualTimespan = pindexLast->GetBlockTime() - nFirstBlockTime;
-    if (nActualTimespan < params.nPowTargetTimespan/4)
-        nActualTimespan = params.nPowTargetTimespan/4;
-    if (nActualTimespan > params.nPowTargetTimespan*4)
-        nActualTimespan = params.nPowTargetTimespan*4;
+    if (nActualTimespan < params.nPowTargetTimespan / 4)
+        nActualTimespan = params.nPowTargetTimespan / 4;
+    if (nActualTimespan > params.nPowTargetTimespan * 4)
+        nActualTimespan = params.nPowTargetTimespan * 4;
 
     // Retarget
     const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);

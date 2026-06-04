@@ -17,8 +17,9 @@ class TxViewDelegate;
 class PlatformStyle;
 class WalletModel;
 
-namespace Ui {
-    class OverviewPage;
+namespace Ui
+{
+class OverviewPage;
 }
 
 QT_BEGIN_NAMESPACE
@@ -31,26 +32,25 @@ class OverviewPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit OverviewPage(const PlatformStyle *platformStyle, QWidget *parent = 0);
+    explicit OverviewPage(const PlatformStyle* platformStyle, QWidget* parent = 0);
     ~OverviewPage();
 
-    void setClientModel(ClientModel *clientModel);
-    void setWalletModel(WalletModel *walletModel);
+    void setClientModel(ClientModel* clientModel);
+    void setWalletModel(WalletModel* walletModel);
     void showOutOfSyncWarning(bool fShow);
     void UpdateTip();
 
 public Q_SLOTS:
-    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance,
-                    const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
+    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
 
 Q_SIGNALS:
-    void transactionClicked(const QModelIndex &index);
+    void transactionClicked(const QModelIndex& index);
     void outOfSyncWarningClicked();
 
 private:
-    Ui::OverviewPage *ui;
-    ClientModel *clientModel;
-    WalletModel *walletModel;
+    Ui::OverviewPage* ui;
+    ClientModel* clientModel;
+    WalletModel* walletModel;
     CAmount currentBalance;
     CAmount currentUnconfirmedBalance;
     CAmount currentImmatureBalance;
@@ -58,13 +58,13 @@ private:
     CAmount currentWatchUnconfBalance;
     CAmount currentWatchImmatureBalance;
 
-    TxViewDelegate *txdelegate;
+    TxViewDelegate* txdelegate;
     std::unique_ptr<TransactionFilterProxy> filter;
 
 private Q_SLOTS:
     void updateDisplayUnit();
-    void handleTransactionClicked(const QModelIndex &index);
-    void updateAlerts(const QString &warnings);
+    void handleTransactionClicked(const QModelIndex& index);
+    void updateAlerts(const QString& warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);
     void handleOutOfSyncWarningClicks();
 };

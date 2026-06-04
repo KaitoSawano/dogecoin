@@ -16,18 +16,18 @@
 #include "ui_addpeerdialog.h"
 #include "ui_testpeerdialog.h"
 
+#include "chainparams.h"
 #include "net.h"
 #include "net_processing.h"
 #include "netbase.h"
 #include "protocol.h"
-#include "chainparams.h"
 #include "util.h"
 
 #include <stdio.h>
 
-#include <QMessageBox>
-#include <QHostAddress>
 #include <QAbstractSocket>
+#include <QHostAddress>
+#include <QMessageBox>
 #include <QUrl>
 
 /** Function to manage peers */
@@ -36,36 +36,29 @@ QString PeerTools::ManagePeer(QString type, QString peer)
     std::string peerAddress = peer.toStdString();
 
     if (peerAddress.size() > 256) {
-      return tr("Error: Node address is invalid");
+        return tr("Error: Node address is invalid");
     }
 
-    if(!g_connman)
+    if (!g_connman)
         return tr("Error: Peer-to-peer functionality missing or disabled");
 
-    if (type == "onetry")
-    {
+    if (type == "onetry") {
         CAddress addr;
         g_connman->OpenNetworkConnection(addr, false, NULL, peerAddress.c_str());
         return tr("Attempted to one try node.");
     }
 
-    if (type == "add")
-    {
-        if(!g_connman->AddNode(peerAddress))
+    if (type == "add") {
+        if (!g_connman->AddNode(peerAddress))
             return tr("Error: Unable to add node");
-    }
-    else if(type == "remove")
-    {
-        if(!g_connman->RemoveAddedNode(peerAddress))
-        {
-            if(!g_connman->DisconnectNode(peerAddress))
+    } else if (type == "remove") {
+        if (!g_connman->RemoveAddedNode(peerAddress)) {
+            if (!g_connman->DisconnectNode(peerAddress))
                 return tr("Node not found in connected nodes");
 
             return tr("Disconnected the node: ") + peer;
-        }
-        else
-        {
-            if(!g_connman->DisconnectNode(peerAddress))
+        } else {
+            if (!g_connman->DisconnectNode(peerAddress))
                 return tr("Node not found in connected nodes");
         }
     }
@@ -87,13 +80,12 @@ QString PeerTools::GetPort()
 }
 
 /** Add Peer Dialog */
-AddPeerDialog::AddPeerDialog(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::AddPeerDialog)
+AddPeerDialog::AddPeerDialog(QWidget* parent) : QWidget(parent),
+                                                ui(new Ui::AddPeerDialog)
 {
     ui->setupUi(this);
 
-    ui->peerPort->setValidator( new QIntValidator(1, 65535, this) );
+    ui->peerPort->setValidator(new QIntValidator(1, 65535, this));
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_addPeerClicked()));
 }
@@ -109,38 +101,34 @@ void AddPeerDialog::on_addPeerClicked()
     QString port = ui->peerPort->text();
     QString data = "";
 
-    if(address.isEmpty())
-    {
+    if (address.isEmpty()) {
         QMessageBox::critical(this, tr("Add Peer"), tr("Please enter an address."), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
 
-    if(port.isEmpty())
-    {
+    if (port.isEmpty()) {
         port = PeerTools::GetPort();
         ui->peerPort->setText(port);
     }
 
-    if(!PeerTools::CheckPeerAddress(address))
-    {
+    if (!PeerTools::CheckPeerAddress(address)) {
         QMessageBox::critical(this, tr("Add Peer"), tr("Please enter a valid peer address."), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
 
     data = address + ":" + port;
 
-    if(QMessageBox::Ok == QMessageBox::information(this, tr("Add Peer"), PeerTools::ManagePeer("add", data), QMessageBox::Ok, QMessageBox::Ok))
+    if (QMessageBox::Ok == QMessageBox::information(this, tr("Add Peer"), PeerTools::ManagePeer("add", data), QMessageBox::Ok, QMessageBox::Ok))
         this->close();
 }
 
 /** Add Test Peer Dialog */
-TestPeerDialog::TestPeerDialog(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::TestPeerDialog)
+TestPeerDialog::TestPeerDialog(QWidget* parent) : QWidget(parent),
+                                                  ui(new Ui::TestPeerDialog)
 {
     ui->setupUi(this);
 
-    ui->peerPort->setValidator( new QIntValidator(1, 65535, this) );
+    ui->peerPort->setValidator(new QIntValidator(1, 65535, this));
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_testPeerClicked()));
 }
@@ -156,26 +144,23 @@ void TestPeerDialog::on_testPeerClicked()
     QString port = ui->peerPort->text();
     QString data = "";
 
-    if(address.isEmpty())
-    {
+    if (address.isEmpty()) {
         QMessageBox::critical(this, tr("Test Peer"), tr("Please enter an address."), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
 
-    if(port.isEmpty())
-    {
+    if (port.isEmpty()) {
         port = PeerTools::GetPort();
         ui->peerPort->setText(port);
     }
 
-    if(!PeerTools::CheckPeerAddress(address))
-    {
+    if (!PeerTools::CheckPeerAddress(address)) {
         QMessageBox::critical(this, tr("Test Peer"), tr("Please enter a valid peer address."), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
 
     data = address + ":" + port;
 
-    if(QMessageBox::Ok == QMessageBox::information(this, tr("Try Peer"), PeerTools::ManagePeer("onetry", data), QMessageBox::Ok, QMessageBox::Ok))
+    if (QMessageBox::Ok == QMessageBox::information(this, tr("Try Peer"), PeerTools::ManagePeer("onetry", data), QMessageBox::Ok, QMessageBox::Ok))
         this->close();
 }

@@ -13,7 +13,8 @@ class CBlockIndex;
 class ImportKeysDialog;
 class PlatformStyle;
 
-namespace Ui {
+namespace Ui
+{
 class ImportKeysDialog;
 }
 
@@ -23,7 +24,7 @@ class ImportKeysDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ImportKeysDialog(const PlatformStyle *_platformStyle, QWidget *parent = 0);
+    explicit ImportKeysDialog(const PlatformStyle* _platformStyle, QWidget* parent = 0);
     ~ImportKeysDialog();
 
 Q_SIGNALS:
@@ -31,8 +32,8 @@ Q_SIGNALS:
     void rescanWallet(CWallet*, CBlockIndex*);
 
 private:
-    Ui::ImportKeysDialog *ui;
-    const PlatformStyle *platformStyle;
+    Ui::ImportKeysDialog* ui;
+    const PlatformStyle* platformStyle;
     QThread thread;
 
 private Q_SLOTS:

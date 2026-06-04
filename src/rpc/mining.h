@@ -20,10 +20,11 @@ public:
     bool found;
     CValidationState state;
 
-    submitblock_StateCatcher(const uint256 &hashIn) : hash(hashIn), found(false), state() {}
+    submitblock_StateCatcher(const uint256& hashIn) : hash(hashIn), found(false), state() {}
 
 protected:
-    virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn) {
+    virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn)
+    {
         if (block.GetHash() != hash)
             return;
         found = true;
@@ -33,4 +34,4 @@ protected:
 
 UniValue BIP22ValidationResult(const CValidationState& state);
 
-#endif //BITCOIN_RPCMINING_H
+#endif // BITCOIN_RPCMINING_H

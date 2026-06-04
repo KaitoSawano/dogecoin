@@ -11,25 +11,25 @@
 #include <string.h>
 
 #if (defined(__ia64__) || defined(__x86_64__)) && \
-    !defined(__APPLE__) && \
+    !defined(__APPLE__) &&                        \
     (defined(USE_AVX2))
 #include <intel-ipsec-mb.h>
 #endif
 
 #if defined(__arm__) || defined(__aarch32__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM)
-# if defined(__GNUC__)
-#  include <stdint.h>
-# endif
-# if defined(__ARM_NEON)|| defined(_MSC_VER) || defined(__GNUC__)
-#  include <arm_neon.h>
-# endif
+#if defined(__GNUC__)
+#include <stdint.h>
+#endif
+#if defined(__ARM_NEON) || defined(_MSC_VER) || defined(__GNUC__)
+#include <arm_neon.h>
+#endif
 /** GCC and LLVM Clang, but not Apple Clang */
-# if defined(__GNUC__) && !defined(__apple_build_version__)
-#  if defined(__ARM_ACLE) || defined(__ARM_FEATURE_CRYPTO)
-#   include "compat/arm_acle_selector.h"
-#  endif
-# endif
-#endif  /** ARM Headers */
+#if defined(__GNUC__) && !defined(__apple_build_version__)
+#if defined(__ARM_ACLE) || defined(__ARM_FEATURE_CRYPTO)
+#include "compat/arm_acle_selector.h"
+#endif
+#endif
+#endif /** ARM Headers */
 
 // Internal implementation code.
 namespace
@@ -78,7 +78,7 @@ void Transform(uint32_t* s, const unsigned char* chunk)
     uint32x4_t ABCD, ABCD_SAVED;
     uint32x4_t TMP0, TMP1;
     uint32x4_t MSG0, MSG1, MSG2, MSG3;
-    uint32_t   E0, E0_SAVED, E1;
+    uint32_t E0, E0_SAVED, E1;
 
     /** Load state */
     ABCD = vld1q_u32(&s[0]);
@@ -345,7 +345,6 @@ void Transform(uint32_t* s, const unsigned char* chunk)
     s[4] += e;
 
 #endif
-
 }
 
 } // namespace sha1

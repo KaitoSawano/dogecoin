@@ -34,9 +34,9 @@ typedef struct {
  *
  * On output, all of x's limbs will be in [0, 2^30).
  */
-static void secp256k1_modinv32_var(secp256k1_modinv32_signed30 *x, const secp256k1_modinv32_modinfo *modinfo);
+static void secp256k1_modinv32_var(secp256k1_modinv32_signed30* x, const secp256k1_modinv32_modinfo* modinfo);
 
 /* Same as secp256k1_modinv32_var, but constant time in x (not in the modulus). */
-static void secp256k1_modinv32(secp256k1_modinv32_signed30 *x, const secp256k1_modinv32_modinfo *modinfo);
+static void secp256k1_modinv32(secp256k1_modinv32_signed30* x, const secp256k1_modinv32_modinfo* modinfo);
 
 #endif /* SECP256K1_MODINV32_H */

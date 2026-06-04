@@ -2,16 +2,16 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 
-#include "policy/policy.h"
 #include "arith_uint256.h"
+#include "dogecoin-fees.h"
 #include "dogecoin.h"
+#include "policy/policy.h"
 #include "txmempool.h"
 #include "util.h"
 #include "validation.h"
-#include "dogecoin-fees.h"
 
 int static generateMTRandom(unsigned int s, int range)
 {
@@ -23,7 +23,7 @@ int static generateMTRandom(unsigned int s, int range)
 // Dogecoin: Normally minimum difficulty blocks can only occur in between
 // retarget blocks. However, once we introduce Digishield every block is
 // a retarget, so we need to handle minimum difficulty on all blocks.
-bool AllowDigishieldMinDifficultyForBlock(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+bool AllowDigishieldMinDifficultyForBlock(const CBlockIndex* pindexLast, const CBlockHeader* pblock, const Consensus::Params& params)
 {
     // check if the chain allows minimum difficulty blocks
     if (!params.fPowAllowMinDifficultyBlocks)
@@ -31,11 +31,11 @@ bool AllowDigishieldMinDifficultyForBlock(const CBlockIndex* pindexLast, const C
 
     // check if the chain allows minimum difficulty blocks on recalc blocks
     if (pindexLast->nHeight < 157500)
-    // if (!params.fPowAllowDigishieldMinDifficultyBlocks)
+        // if (!params.fPowAllowDigishieldMinDifficultyBlocks)
         return false;
 
     // Allow for a minimum block time if the elapsed time > 2*nTargetSpacing
-    return (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing*2);
+    return (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing * 2);
 }
 
 unsigned int CalculateDogecoinNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
@@ -47,7 +47,7 @@ unsigned int CalculateDogecoinNextWorkRequired(const CBlockIndex* pindexLast, in
     int64_t nMaxTimespan;
     int64_t nMinTimespan;
 
-    if (params.fDigishieldDifficultyCalculation) //DigiShield implementation - thanks to RealSolid & WDC for this code
+    if (params.fDigishieldDifficultyCalculation) // DigiShield implementation - thanks to RealSolid & WDC for this code
     {
         // amplitude filter - thanks to daft27 for this code
         nModulatedTimespan = retargetTimespan + (nModulatedTimespan - retargetTimespan) / 8;
@@ -93,14 +93,14 @@ bool CheckAuxPowProofOfWork(const CBlockHeader& block, const Consensus::Params& 
     if (!block.IsLegacy() && params.fStrictChainId && block.GetChainId() != params.nAuxpowChainId)
         return error("%s : block does not have our chain ID"
                      " (got %d, expected %d, full nVersion %d)",
-                     __func__, block.GetChainId(),
-                     params.nAuxpowChainId, block.nVersion);
+            __func__, block.GetChainId(),
+            params.nAuxpowChainId, block.nVersion);
 
     /* If there is no auxpow, just check the block hash.  */
     if (!block.auxpow) {
         if (block.IsAuxpow())
             return error("%s : no auxpow on block with auxpow version",
-                         __func__);
+                __func__);
 
         if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, params))
             return error("%s : non-AUX proof of work failed", __func__);
@@ -126,8 +126,7 @@ CAmount GetDogecoinBlockSubsidy(int nHeight, const Consensus::Params& consensusP
 {
     int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
 
-    if (!consensusParams.fSimplifiedRewards)
-    {
+    if (!consensusParams.fSimplifiedRewards) {
         // Old-style rewards derived from the previous block hash
         const std::string cseed_str = prevHash.ToString().substr(7, 7);
         const char* cseed = cseed_str.c_str();
@@ -145,5 +144,3 @@ CAmount GetDogecoinBlockSubsidy(int nHeight, const Consensus::Params& consensusP
         return 10000 * COIN;
     }
 }
-
-

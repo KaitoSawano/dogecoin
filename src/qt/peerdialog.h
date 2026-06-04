@@ -6,18 +6,19 @@
 #ifndef BITCOIN_QT_PEERDIALOG_H
 #define BITCOIN_QT_PEERDIALOG_H
 
+#include "guiutil.h"
 #include <QObject>
 #include <QWidget>
 #include <string>
-#include "guiutil.h"
 
 class PeerTools;
 
-namespace Ui {
-    class AddPeerDialog;
-    class RemovePeerDialog;
-    class TestPeerDialog;
-}
+namespace Ui
+{
+class AddPeerDialog;
+class RemovePeerDialog;
+class TestPeerDialog;
+} // namespace Ui
 
 /** Class to manage peers */
 class PeerTools : public QObject
@@ -38,10 +39,11 @@ class AddPeerDialog : public QWidget
     Q_OBJECT
 
 public:
-    explicit AddPeerDialog(QWidget *parent);
+    explicit AddPeerDialog(QWidget* parent);
     ~AddPeerDialog();
+
 private:
-    Ui::AddPeerDialog *ui;
+    Ui::AddPeerDialog* ui;
 private Q_SLOTS:
     void on_addPeerClicked();
 };
@@ -52,10 +54,11 @@ class TestPeerDialog : public QWidget
     Q_OBJECT
 
 public:
-    explicit TestPeerDialog(QWidget *parent);
+    explicit TestPeerDialog(QWidget* parent);
     ~TestPeerDialog();
+
 private:
-    Ui::TestPeerDialog *ui;
+    Ui::TestPeerDialog* ui;
 private Q_SLOTS:
     void on_testPeerClicked();
 };

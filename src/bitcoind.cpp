@@ -12,13 +12,13 @@
 #include "clientversion.h"
 #include "compat.h"
 #include "fs.h"
-#include "rpc/server.h"
+#include "httprpc.h"
+#include "httpserver.h"
 #include "init.h"
 #include "noui.h"
+#include "rpc/server.h"
 #include "scheduler.h"
 #include "util.h"
-#include "httpserver.h"
-#include "httprpc.h"
 #include "utilstrencodings.h"
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -46,13 +46,11 @@ void WaitForShutdown(boost::thread_group* threadGroup)
 {
     bool fShutdown = ShutdownRequested();
     // Tell the main threads to shutdown.
-    while (!fShutdown)
-    {
+    while (!fShutdown) {
         MilliSleep(200);
         fShutdown = ShutdownRequested();
     }
-    if (threadGroup)
-    {
+    if (threadGroup) {
         Interrupt(*threadGroup);
         threadGroup->join_all();
     }
@@ -76,18 +74,14 @@ bool AppInit(int argc, char* argv[])
     ParseParameters(argc, argv);
 
     // Process help and version before taking care about datadir
-    if (IsArgSet("-?") || IsArgSet("-h") ||  IsArgSet("-help") || IsArgSet("-version"))
-    {
+    if (IsArgSet("-?") || IsArgSet("-h") || IsArgSet("-help") || IsArgSet("-version")) {
         std::string strUsage = strprintf(_("%s Daemon"), _(PACKAGE_NAME)) + " " + _("version") + " " + FormatFullVersion() + "\n";
 
-        if (IsArgSet("-version"))
-        {
+        if (IsArgSet("-version")) {
             strUsage += FormatParagraph(LicenseInfo());
-        }
-        else
-        {
+        } else {
             strUsage += "\n" + _("Usage:") + "\n" +
-                  "  dogecoind [options]                     " + strprintf(_("Start %s Daemon"), _(PACKAGE_NAME)) + "\n";
+                        "  dogecoind [options]                     " + strprintf(_("Start %s Daemon"), _(PACKAGE_NAME)) + "\n";
 
             strUsage += "\n" + HelpMessage(HMM_BITCOIND);
         }
@@ -96,18 +90,15 @@ bool AppInit(int argc, char* argv[])
         return true;
     }
 
-    try
-    {
-        if (!fs::is_directory(GetDataDir(false)))
-        {
+    try {
+        if (!fs::is_directory(GetDataDir(false))) {
             fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", GetArg("-datadir", "").c_str());
             return false;
         }
-        try
-        {
+        try {
             ReadConfigFile(GetArg("-conf", BITCOIN_CONF_FILENAME));
         } catch (const std::exception& e) {
-            fprintf(stderr,"Error reading configuration file: %s\n", e.what());
+            fprintf(stderr, "Error reading configuration file: %s\n", e.what());
             return false;
         }
         // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
@@ -124,8 +115,7 @@ bool AppInit(int argc, char* argv[])
             if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "dogecoin:"))
                 fCommandLine = true;
 
-        if (fCommandLine)
-        {
+        if (fCommandLine) {
             fprintf(stderr, "Error: There is no RPC client functionality in dogecoind anymore. Use the dogecoin-cli utility instead.\n");
             exit(EXIT_FAILURE);
         }
@@ -134,23 +124,19 @@ bool AppInit(int argc, char* argv[])
         // Set this early so that parameter interactions go to console
         InitLogging();
         InitParameterInteraction();
-        if (!AppInitBasicSetup())
-        {
+        if (!AppInitBasicSetup()) {
             // InitError will have been called with detailed error, which ends up on console
             exit(1);
         }
-        if (!AppInitParameterInteraction())
-        {
+        if (!AppInitParameterInteraction()) {
             // InitError will have been called with detailed error, which ends up on console
             exit(1);
         }
-        if (!AppInitSanityChecks())
-        {
+        if (!AppInitSanityChecks()) {
             // InitError will have been called with detailed error, which ends up on console
             exit(1);
         }
-        if (GetBoolArg("-daemon", false))
-        {
+        if (GetBoolArg("-daemon", false)) {
 #if HAVE_DECL_DAEMON
             fprintf(stdout, "Dogecoin server starting\n");
 
@@ -166,15 +152,13 @@ bool AppInit(int argc, char* argv[])
         }
 
         fRet = AppInitMain(threadGroup, scheduler);
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {
         PrintExceptionContinue(NULL, "AppInit()");
     }
 
-    if (!fRet)
-    {
+    if (!fRet) {
         Interrupt(threadGroup);
         // threadGroup.join_all(); was left out intentionally here, because we didn't re-test all of
         // the startup-failure cases to make sure they don't result in a hang due to some

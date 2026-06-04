@@ -5,11 +5,11 @@
 #ifndef _BITCOIN_CUCKOOCACHE_H_
 #define _BITCOIN_CUCKOOCACHE_H_
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <atomic>
-#include <cstring>
 #include <cmath>
+#include <cstring>
 #include <memory>
 #include <vector>
 
@@ -218,13 +218,13 @@ private:
     inline std::array<uint32_t, 8> compute_hashes(const Element& e) const
     {
         return {{hash_function.template operator()<0>(e) & hash_mask,
-                 hash_function.template operator()<1>(e) & hash_mask,
-                 hash_function.template operator()<2>(e) & hash_mask,
-                 hash_function.template operator()<3>(e) & hash_mask,
-                 hash_function.template operator()<4>(e) & hash_mask,
-                 hash_function.template operator()<5>(e) & hash_mask,
-                 hash_function.template operator()<6>(e) & hash_mask,
-                 hash_function.template operator()<7>(e) & hash_mask}};
+            hash_function.template operator()<1>(e) & hash_mask,
+            hash_function.template operator()<2>(e) & hash_mask,
+            hash_function.template operator()<3>(e) & hash_mask,
+            hash_function.template operator()<4>(e) & hash_mask,
+            hash_function.template operator()<5>(e) & hash_mask,
+            hash_function.template operator()<6>(e) & hash_mask,
+            hash_function.template operator()<7>(e) & hash_mask}};
     }
 
     /* end
@@ -292,7 +292,7 @@ private:
             // epoch_unused_count), but we already know that `epoch_unused_count
             // < epoch_size` in this branch
             epoch_heuristic_counter = std::max(1u, std::max(epoch_size / 16,
-                        epoch_size - epoch_unused_count));
+                                                       epoch_size - epoch_unused_count));
     }
 
 public:
@@ -300,7 +300,7 @@ public:
      * call to setup or setup_bytes, otherwise operations may segfault.
      */
     cache() : table(), size(), collection_flags(0), epoch_flags(),
-    epoch_heuristic_counter(), epoch_size(), depth_limit(0), hash_function()
+              epoch_heuristic_counter(), epoch_size(), depth_limit(0), hash_function()
     {
     }
 
@@ -317,7 +317,7 @@ public:
         // depth_limit must be at least one otherwise errors can occur.
         depth_limit = static_cast<uint8_t>(std::log2(static_cast<float>(std::max((uint32_t)2, new_size))));
         size = 1 << depth_limit;
-        hash_mask = size-1;
+        hash_mask = size - 1;
         table.resize(size);
         collection_flags.setup(size);
         epoch_flags.resize(size);
@@ -342,7 +342,7 @@ public:
      */
     uint32_t setup_bytes(size_t bytes)
     {
-        return setup(bytes/sizeof(Element));
+        return setup(bytes / sizeof(Element));
     }
 
     /** insert loops at most depth_limit times trying to insert a hash
@@ -390,19 +390,19 @@ public:
                 return;
             }
             /** Swap with the element at the location that was
-            * not the last one looked at. Example:
-            *
-            * 1) On first iteration, last_loc == invalid(), find returns last, so
-            *    last_loc defaults to locs[0].
-            * 2) On further iterations, where last_loc == locs[k], last_loc will
-            *    go to locs[k+1 % 8], i.e., next of the 8 indices wrapping around
-            *    to 0 if needed.
-            *
-            * This prevents moving the element we just put in.
-            *
-            * The swap is not a move -- we must switch onto the evicted element
-            * for the next iteration.
-            */
+             * not the last one looked at. Example:
+             *
+             * 1) On first iteration, last_loc == invalid(), find returns last, so
+             *    last_loc defaults to locs[0].
+             * 2) On further iterations, where last_loc == locs[k], last_loc will
+             *    go to locs[k+1 % 8], i.e., next of the 8 indices wrapping around
+             *    to 0 if needed.
+             *
+             * This prevents moving the element we just put in.
+             *
+             * The swap is not a move -- we must switch onto the evicted element
+             * for the next iteration.
+             */
             last_loc = locs[(1 + (std::find(locs.begin(), locs.end(), last_loc) - locs.begin())) & 7];
             std::swap(table[last_loc], e);
             // Can't std::swap a std::vector<bool>::reference and a bool&.

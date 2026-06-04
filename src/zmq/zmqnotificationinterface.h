@@ -6,8 +6,8 @@
 #define BITCOIN_ZMQ_ZMQNOTIFICATIONINTERFACE_H
 
 #include "validationinterface.h"
-#include <string>
 #include <map>
+#include <string>
 
 class CBlockIndex;
 class CZMQAbstractNotifier;
@@ -24,13 +24,13 @@ protected:
     void Shutdown();
 
     // CValidationInterface
-    void SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock);
-    void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload);
+    void SyncTransaction(const CTransaction& tx, const CBlockIndex* pindex, int posInBlock);
+    void UpdatedBlockTip(const CBlockIndex* pindexNew, const CBlockIndex* pindexFork, bool fInitialDownload);
 
 private:
     CZMQNotificationInterface();
 
-    void *pcontext;
+    void* pcontext;
     std::list<CZMQAbstractNotifier*> notifiers;
 };
 

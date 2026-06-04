@@ -16,7 +16,8 @@
 
 BOOST_FIXTURE_TEST_SUITE(txrequest_tests, BasicTestingSetup)
 
-namespace {
+namespace
+{
 
 FastRandomContext g_insecure_rand_ctx;
 
@@ -26,14 +27,13 @@ constexpr int64_t MICROSECOND = 1;
 constexpr int64_t NO_TIME = 0;
 
 /** An Action is a function to call at a particular (simulated) timestamp. */
-using Action = std::pair<int64_t, std::function<void()>>;
+using Action = std::pair<int64_t, std::function<void()> >;
 
 /** Object that stores actions from multiple interleaved scenarios, and data shared across them.
  *
  * The Scenario below is used to fill this.
  */
-struct Runner
-{
+struct Runner {
     /** The TxRequestTracker being tested. */
     TxRequestTracker txrequest;
 
@@ -52,7 +52,7 @@ struct Runner
      * return value to avoid introducing a dependency between the various
      * parallel tests.
      */
-    std::multiset<std::pair<NodeId, uint256>> expired;
+    std::multiset<std::pair<NodeId, uint256> > expired;
 };
 
 int64_t RandomTime8s() { return int64_t(1 + InsecureRandBits(23)); }
@@ -93,7 +93,7 @@ public:
     void ForgetTxHash(const uint256& txhash)
     {
         auto& runner = m_runner;
-        runner.actions.emplace_back(m_now, [=,&runner]() {
+        runner.actions.emplace_back(m_now, [=, &runner]() {
             runner.txrequest.ForgetTxHash(txhash);
             runner.txrequest.SanityCheck();
         });
@@ -103,7 +103,7 @@ public:
     void ReceivedInv(NodeId peer, uint256& txhash, bool pref, int64_t reqtime)
     {
         auto& runner = m_runner;
-        runner.actions.emplace_back(m_now, [=,&runner]() {
+        runner.actions.emplace_back(m_now, [=, &runner]() {
             runner.txrequest.ReceivedInv(peer, txhash, pref, reqtime);
             runner.txrequest.SanityCheck();
         });
@@ -113,7 +113,7 @@ public:
     void DisconnectedPeer(NodeId peer)
     {
         auto& runner = m_runner;
-        runner.actions.emplace_back(m_now, [=,&runner]() {
+        runner.actions.emplace_back(m_now, [=, &runner]() {
             runner.txrequest.DisconnectedPeer(peer);
             runner.txrequest.SanityCheck();
         });
@@ -123,7 +123,7 @@ public:
     void RequestedTx(NodeId peer, const uint256& txhash, int64_t exptime)
     {
         auto& runner = m_runner;
-        runner.actions.emplace_back(m_now, [=,&runner]() {
+        runner.actions.emplace_back(m_now, [=, &runner]() {
             runner.txrequest.RequestedTx(peer, txhash, exptime);
             runner.txrequest.SanityCheck();
         });
@@ -133,7 +133,7 @@ public:
     void ReceivedResponse(NodeId peer, const uint256& txhash)
     {
         auto& runner = m_runner;
-        runner.actions.emplace_back(m_now, [=,&runner]() {
+        runner.actions.emplace_back(m_now, [=, &runner]() {
             runner.txrequest.ReceivedResponse(peer, txhash);
             runner.txrequest.SanityCheck();
         });
@@ -150,18 +150,17 @@ public:
      * @param offset     Offset with the current time to use (must be <= 0). This allows simulations of time going
      *                   backwards (but note that the ordering of this event only follows the scenario's m_now.
      */
-    void Check(NodeId peer, const std::vector<uint256>& expected, size_t candidates, size_t inflight,
-        size_t completed, const std::string& checkname,
-        int64_t offset = int64_t(0))
+    void Check(NodeId peer, const std::vector<uint256>& expected, size_t candidates, size_t inflight, size_t completed, const std::string& checkname, int64_t offset = int64_t(0))
     {
         const auto comment = m_testname + " " + checkname;
         auto& runner = m_runner;
         const auto now = m_now;
         assert(offset <= 0);
-        runner.actions.emplace_back(m_now, [=,&runner]() {
-            std::vector<std::pair<NodeId, uint256>> expired_now;
+        runner.actions.emplace_back(m_now, [=, &runner]() {
+            std::vector<std::pair<NodeId, uint256> > expired_now;
             auto ret = runner.txrequest.GetRequestable(peer, now + offset, &expired_now);
-            for (const auto& entry : expired_now) runner.expired.insert(entry);
+            for (const auto& entry : expired_now)
+                runner.expired.insert(entry);
             runner.txrequest.SanityCheck();
             runner.txrequest.PostGetRequestableSanityCheck(now + offset);
             size_t total = candidates + inflight + completed;
@@ -183,7 +182,7 @@ public:
     {
         const auto& testname = m_testname;
         auto& runner = m_runner;
-        runner.actions.emplace_back(m_now, [=,&runner]() {
+        runner.actions.emplace_back(m_now, [=, &runner]() {
             auto it = runner.expired.find(std::pair<NodeId, uint256>{peer, txhash});
             BOOST_CHECK_MESSAGE(it != runner.expired.end(), "[" + testname + "] missing expiration");
             if (it != runner.expired.end()) runner.expired.erase(it);
@@ -198,7 +197,7 @@ public:
      * where priority is the predicted internal TxRequestTracker's priority, assuming all announcements
      * are within the same preferredness class.
      */
-    uint256 NewTxHash(const std::vector<std::vector<NodeId>>& orders = {})
+    uint256 NewTxHash(const std::vector<std::vector<NodeId> >& orders = {})
     {
         uint256 ret;
         bool ok;
@@ -219,7 +218,7 @@ public:
             if (ok) {
                 ok = m_runner.txhashset.insert(ret).second;
             }
-        } while(!ok);
+        } while (!ok);
         return ret;
     }
 
@@ -232,7 +231,7 @@ public:
         do {
             ret = InsecureRandBits(63);
             ok = m_runner.peerset.insert(ret).second;
-        } while(!ok);
+        } while (!ok);
         return ret;
     }
 
@@ -372,8 +371,8 @@ void BuildBigPriorityTest(Scenario& scenario, int peers)
     // We will have N peers announce the same transaction.
     std::map<NodeId, bool> preferred;
     std::vector<NodeId> pref_peers, npref_peers;
-    int num_pref = InsecureRandRange(peers + 1) ; // Some preferred, ...
-    int num_npref = peers - num_pref; // some not preferred.
+    int num_pref = InsecureRandRange(peers + 1); // Some preferred, ...
+    int num_npref = peers - num_pref;            // some not preferred.
     for (int i = 0; i < num_pref; ++i) {
         pref_peers.push_back(scenario.NewPeer());
         preferred[pref_peers.back()] = true;
@@ -384,8 +383,10 @@ void BuildBigPriorityTest(Scenario& scenario, int peers)
     }
     // Make a list of all peers, in order of intended request order (concatenation of pref_peers and npref_peers).
     std::vector<NodeId> request_order;
-    for (int i = 0; i < num_pref; ++i) request_order.push_back(pref_peers[i]);
-    for (int i = 0; i < num_npref; ++i) request_order.push_back(npref_peers[i]);
+    for (int i = 0; i < num_pref; ++i)
+        request_order.push_back(pref_peers[i]);
+    for (int i = 0; i < num_npref; ++i)
+        request_order.push_back(npref_peers[i]);
 
     // Determine the announcement order randomly.
     std::vector<NodeId> announce_order = request_order;
@@ -680,15 +681,15 @@ void BuildWeirdRequestsTest(Scenario& scenario)
 void TestInterleavedScenarios()
 {
     // Create a list of functions which add tests to scenarios.
-    std::vector<std::function<void(Scenario&)>> builders;
+    std::vector<std::function<void(Scenario&)> > builders;
     // Add instances of every test, for every configuration.
     for (int n = 0; n < 64; ++n) {
-        builders.emplace_back([n](Scenario& scenario){ BuildRequestOrderTest(scenario, n & 3); });
-        builders.emplace_back([n](Scenario& scenario){ BuildSingleTest(scenario, n & 31); });
-        builders.emplace_back([n](Scenario& scenario){ BuildPriorityTest(scenario, n & 31); });
-        builders.emplace_back([n](Scenario& scenario){ BuildBigPriorityTest(scenario, (n & 7) + 1); });
-        builders.emplace_back([](Scenario& scenario){ BuildTimeBackwardsTest(scenario); });
-        builders.emplace_back([](Scenario& scenario){ BuildWeirdRequestsTest(scenario); });
+        builders.emplace_back([n](Scenario& scenario) { BuildRequestOrderTest(scenario, n & 3); });
+        builders.emplace_back([n](Scenario& scenario) { BuildSingleTest(scenario, n & 31); });
+        builders.emplace_back([n](Scenario& scenario) { BuildPriorityTest(scenario, n & 31); });
+        builders.emplace_back([n](Scenario& scenario) { BuildBigPriorityTest(scenario, (n & 7) + 1); });
+        builders.emplace_back([](Scenario& scenario) { BuildTimeBackwardsTest(scenario); });
+        builders.emplace_back([](Scenario& scenario) { BuildWeirdRequestsTest(scenario); });
     }
     // Randomly shuffle all those functions.
     std::shuffle(builders.begin(), builders.end(), g_insecure_rand_ctx);
@@ -722,7 +723,7 @@ void TestInterleavedScenarios()
     BOOST_CHECK(runner.expired.empty());
 }
 
-}  // namespace
+} // namespace
 
 BOOST_AUTO_TEST_CASE(TxRequestTest)
 {

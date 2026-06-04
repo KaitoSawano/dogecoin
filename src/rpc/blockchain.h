@@ -6,9 +6,9 @@
 #ifndef BITCOIN_RPC_BLOCKCHAIN_H
 #define BITCOIN_RPC_BLOCKCHAIN_H
 
-#include <vector>
-#include <stdint.h>
 #include <amount.h>
+#include <stdint.h>
+#include <vector>
 
 class CBlock;
 class CBlockIndex;
@@ -17,6 +17,6 @@ class UniValue;
 static constexpr int NUM_GETBLOCKSTATS_PERCENTILES = 5;
 
 /** Used by getblockstats to get feerates at different percentiles by weight  */
-void CalculatePercentilesBySize(CAmount result[NUM_GETBLOCKSTATS_PERCENTILES], std::vector<std::pair<CAmount, int64_t>>& scores, int64_t total_size);
+void CalculatePercentilesBySize(CAmount result[NUM_GETBLOCKSTATS_PERCENTILES], std::vector<std::pair<CAmount, int64_t> >& scores, int64_t total_size);
 
 #endif

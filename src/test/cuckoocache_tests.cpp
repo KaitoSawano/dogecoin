@@ -2,13 +2,13 @@
 // Copyright (c) 2023 The Dogecoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#include <boost/test/unit_test.hpp>
 #include "cuckoocache.h"
-#include "test/test_bitcoin.h"
 #include "random.h"
-#include <thread>
-#include <deque>
+#include "test/test_bitcoin.h"
+#include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
+#include <deque>
+#include <thread>
 
 
 /** Test Suite for CuckooCache
@@ -46,7 +46,7 @@ public:
     template <uint8_t hash_select>
     uint32_t operator()(const uint256& key) const
     {
-        static_assert(hash_select <8, "SignatureCacheHasher only has 8 hashes available.");
+        static_assert(hash_select < 8, "SignatureCacheHasher only has 8 hashes available.");
         uint32_t u;
         std::memcpy(&u, key.begin() + 4 * hash_select, 4);
         return u;
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(cuckoocache_hit_rate_ok)
     double HitRateThresh = 0.98;
     size_t megabytes = 32;
     for (double load = 0.1; load < 2; load *= 2) {
-        double hits = test_cache<CuckooCache::cache<uint256, uint256Hasher>>(megabytes, load);
+        double hits = test_cache<CuckooCache::cache<uint256, uint256Hasher> >(megabytes, load);
         BOOST_CHECK(normalize_hit_rate(hits, load) > HitRateThresh);
     }
 }
@@ -207,7 +207,7 @@ void test_cache_erase(size_t megabytes)
 BOOST_AUTO_TEST_CASE(cuckoocache_erase_ok)
 {
     size_t megabytes = 32;
-    test_cache_erase<CuckooCache::cache<uint256, uint256Hasher>>(megabytes);
+    test_cache_erase<CuckooCache::cache<uint256, uint256Hasher> >(megabytes);
 }
 
 template <typename Cache>
@@ -247,12 +247,12 @@ void test_cache_erase_parallel(size_t megabytes)
     /** Erase the first quarter */
     for (uint32_t x = 0; x < 3; ++x)
         /** Each thread is emplaced with x copy-by-value
-        */
+         */
         threads.emplace_back([&, x] {
             boost::shared_lock<boost::shared_mutex> l(mtx);
-            size_t ntodo = (n_insert/4)/3;
-            size_t start = ntodo*x;
-            size_t end = ntodo*(x+1);
+            size_t ntodo = (n_insert / 4) / 3;
+            size_t start = ntodo * x;
+            size_t end = ntodo * (x + 1);
             for (uint32_t i = start; i < end; ++i)
                 set.contains(hashes[i], true);
         });
@@ -294,7 +294,7 @@ void test_cache_erase_parallel(size_t megabytes)
 BOOST_AUTO_TEST_CASE(cuckoocache_erase_parallel_ok)
 {
     size_t megabytes = 32;
-    test_cache_erase_parallel<CuckooCache::cache<uint256, uint256Hasher>>(megabytes);
+    test_cache_erase_parallel<CuckooCache::cache<uint256, uint256Hasher> >(megabytes);
 }
 
 
@@ -390,7 +390,7 @@ void test_cache_generations()
 }
 BOOST_AUTO_TEST_CASE(cuckoocache_generations)
 {
-    test_cache_generations<CuckooCache::cache<uint256, uint256Hasher>>();
+    test_cache_generations<CuckooCache::cache<uint256, uint256Hasher> >();
 }
 
 BOOST_AUTO_TEST_SUITE_END();

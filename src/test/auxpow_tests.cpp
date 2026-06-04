@@ -52,44 +52,44 @@ public:
     int auxpowChainIndex;
 
     /**
-   * Initialise everything.
-   * @param baseVersion The parent block's base version to use.
-   * @param chainId The parent block's chain ID to use.
-   */
+     * Initialise everything.
+     * @param baseVersion The parent block's base version to use.
+     * @param chainId The parent block's chain ID to use.
+     */
     CAuxpowBuilder(int baseVersion, int chainId);
 
     /**
-   * Set the coinbase's script.
-   * @param scr Set it to this script.
-   */
+     * Set the coinbase's script.
+     * @param scr Set it to this script.
+     */
     void setCoinbase(const CScript& scr);
 
     /**
-   * Build the auxpow merkle branch.  The member variables will be
-   * set accordingly.  This has to be done before constructing the coinbase
-   * itself (which must contain the root merkle hash).  When we have the
-   * coinbase afterwards, the member variables can be used to initialise
-   * the CAuxPow object from it.
-   * @param hashAux The merge-mined chain's block hash.
-   * @param h Height of the merkle tree to build.
-   * @param index Index to use in the merkle tree.
-   * @return The root hash, with reversed endian.
-   */
+     * Build the auxpow merkle branch.  The member variables will be
+     * set accordingly.  This has to be done before constructing the coinbase
+     * itself (which must contain the root merkle hash).  When we have the
+     * coinbase afterwards, the member variables can be used to initialise
+     * the CAuxPow object from it.
+     * @param hashAux The merge-mined chain's block hash.
+     * @param h Height of the merkle tree to build.
+     * @param index Index to use in the merkle tree.
+     * @return The root hash, with reversed endian.
+     */
     std::vector<unsigned char> buildAuxpowChain(const uint256& hashAux, unsigned h, int index);
 
     /**
-   * Build the finished CAuxPow object.  We assume that the auxpowChain
-   * member variables are already set.  We use the passed in transaction
-   * as the base.  It should (probably) be the parent block's coinbase.
-   * @param tx The base tx to use.
-   * @return The constructed CAuxPow object.
-   */
+     * Build the finished CAuxPow object.  We assume that the auxpowChain
+     * member variables are already set.  We use the passed in transaction
+     * as the base.  It should (probably) be the parent block's coinbase.
+     * @param tx The base tx to use.
+     * @return The constructed CAuxPow object.
+     */
     CAuxPow get(const CTransactionRef tx) const;
 
     /**
-   * Build the finished CAuxPow object from the parent block's coinbase.
-   * @return The constructed CAuxPow object.
-   */
+     * Build the finished CAuxPow object from the parent block's coinbase.
+     * @return The constructed CAuxPow object.
+     */
     inline CAuxPow
     get() const
     {
@@ -98,15 +98,15 @@ public:
     }
 
     /**
-   * Build a data vector to be included in the coinbase.  It consists
-   * of the aux hash, the merkle tree size and the nonce.  Optionally,
-   * the header can be added as well.
-   * @param header Add the header?
-   * @param hashAux The aux merkle root hash.
-   * @param h Height of the merkle tree.
-   * @param nonce The nonce value to use.
-   * @return The constructed data.
-   */
+     * Build a data vector to be included in the coinbase.  It consists
+     * of the aux hash, the merkle tree size and the nonce.  Optionally,
+     * the header can be added as well.
+     * @param header Add the header?
+     * @param hashAux The aux merkle root hash.
+     * @param h Height of the merkle tree.
+     * @param nonce The nonce value to use.
+     * @return The constructed data.
+     */
     static std::vector<unsigned char> buildCoinbaseData(bool header, const std::vector<unsigned char>& auxRoot, unsigned h, int nonce);
 };
 
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(check_auxpow)
     CMutableTransaction mtx(*builder.parentBlock.vtx[0]);
     mtx.vin.clear();
     builder.parentBlock.vtx.clear();
-    builder.parentBlock.vtx.push_back (MakeTransactionRef(std::move (mtx)));
+    builder.parentBlock.vtx.push_back(MakeTransactionRef(std::move(mtx)));
     builder.parentBlock.hashMerkleRoot = BlockMerkleRoot(builder.parentBlock);
     BOOST_CHECK(!builder.get().check(hashAux, ourChainId, params));
 

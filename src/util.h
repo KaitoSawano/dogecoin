@@ -34,7 +34,7 @@
 int64_t GetStartupTime();
 
 static const bool DEFAULT_LOGTIMEMICROS = false;
-static const bool DEFAULT_LOGIPS        = false;
+static const bool DEFAULT_LOGIPS = false;
 static const bool DEFAULT_LOGTIMESTAMPS = true;
 
 /** Signals for translation. */
@@ -42,7 +42,7 @@ class CTranslationInterface
 {
 public:
     /** Translate a message to the native language of the user. */
-    boost::signals2::signal<std::string (const char* psz)> Translate;
+    boost::signals2::signal<std::string(const char* psz)> Translate;
 };
 
 extern const std::map<std::string, std::vector<std::string> >& mapMultiArgs;
@@ -56,8 +56,8 @@ extern bool fLogIPs;
 extern std::atomic<bool> fReopenDebugLog;
 extern CTranslationInterface translationInterface;
 
-extern const char * const BITCOIN_CONF_FILENAME;
-extern const char * const BITCOIN_PID_FILENAME;
+extern const char* const BITCOIN_CONF_FILENAME;
+extern const char* const BITCOIN_PID_FILENAME;
 
 /**
  * Translation function: Call Translate signal on UI interface, which returns a boost::optional result.
@@ -75,41 +75,43 @@ bool SetupNetworking();
 /** Return true if log accepts specified category */
 bool LogAcceptCategory(const char* category);
 /** Send a string to the log output */
-int LogPrintStr(const std::string &str);
+int LogPrintStr(const std::string& str);
 
-#define LogPrint(category, ...) do { \
-    if (LogAcceptCategory((category))) { \
+#define LogPrint(category, ...)                    \
+    do {                                           \
+        if (LogAcceptCategory((category))) {       \
+            LogPrintStr(tfm::format(__VA_ARGS__)); \
+        }                                          \
+    } while (0)
+
+#define LogPrintf(...)                         \
+    do {                                       \
         LogPrintStr(tfm::format(__VA_ARGS__)); \
-    } \
-} while(0)
+    } while (0)
 
-#define LogPrintf(...) do { \
-    LogPrintStr(tfm::format(__VA_ARGS__)); \
-} while(0)
-
-template<typename... Args>
+template <typename... Args>
 bool error(const char* fmt, const Args&... args)
 {
     LogPrintStr("ERROR: " + tfm::format(fmt, args...) + "\n");
     return false;
 }
 
-void PrintExceptionContinue(const std::exception *pex, const char* pszThread);
-void ParseParameters(int argc, const char*const argv[]);
-void FileCommit(FILE *file);
-bool TruncateFile(FILE *file, unsigned int length);
+void PrintExceptionContinue(const std::exception* pex, const char* pszThread);
+void ParseParameters(int argc, const char* const argv[]);
+void FileCommit(FILE* file);
+bool TruncateFile(FILE* file, unsigned int length);
 int RaiseFileDescriptorLimit(int nMinFD);
-void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length);
+void AllocateFileRange(FILE* file, unsigned int offset, unsigned int length);
 bool RenameOver(fs::path src, fs::path dest);
 bool TryCreateDirectory(const fs::path& p);
 fs::path GetDefaultDataDir();
-const fs::path &GetDataDir(bool fNetSpecific = true);
-const fs::path &GetBackupDir();
+const fs::path& GetDataDir(bool fNetSpecific = true);
+const fs::path& GetBackupDir();
 void ClearDatadirCache();
 fs::path GetConfigFile(const std::string& confPath);
 #ifndef WIN32
 fs::path GetPidFile();
-void CreatePidFile(const fs::path &path, pid_t pid);
+void CreatePidFile(const fs::path& path, pid_t pid);
 #endif
 void ReadConfigFile(const std::string& confPath);
 #ifdef WIN32
@@ -213,26 +215,22 @@ void RenameThread(const char* name);
 /**
  * .. and a wrapper that just calls func once
  */
-template <typename Callable> void TraceThread(const char* name,  Callable func)
+template <typename Callable>
+void TraceThread(const char* name, Callable func)
 {
     std::string s = strprintf("dogecoin-%s", name);
     RenameThread(s.c_str());
-    try
-    {
+    try {
         LogPrintf("%s thread start\n", name);
         func();
         LogPrintf("%s thread exit\n", name);
-    }
-    catch (const boost::thread_interrupted&)
-    {
+    } catch (const boost::thread_interrupted&) {
         LogPrintf("%s thread interrupt\n", name);
         throw;
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         PrintExceptionContinue(&e, name);
         throw;
-    }
-    catch (...) {
+    } catch (...) {
         PrintExceptionContinue(NULL, name);
         throw;
     }

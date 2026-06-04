@@ -89,7 +89,7 @@ public:
         consensus.nPowTargetTimespan = 4 * 60 * 60; // pre-digishield: 4 hours
         consensus.nPowTargetSpacing = 60; // 1 minute
         consensus.fDigishieldDifficultyCalculation = false;
-        consensus.nCoinbaseMaturity = 30;
+        consensus.nCoinbaseMaturity = 95;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowAllowDigishieldMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
